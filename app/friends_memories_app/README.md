@@ -1,6 +1,6 @@
 # friends_memories_app
 
-This is an app for creating  memories with eachother
+This is an app for creating memories with eachother by sharing photos and videos made at that special moment to capture them, also storing them.
 
 ## Getting Started
 
