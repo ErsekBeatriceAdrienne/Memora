@@ -1,0 +1,8 @@
+def upload_file_to_firebase(file_path, destination_blob_name):
+    # Uploads a file to Firebase storage
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(file_path)
+    print(f"File {file_path} uploaded to {destination_blob_name}.")
+
+# Example call to upload a file
+upload_file_to_firebase('path/to/your/image.jpg', 'uploads/image.jpg')

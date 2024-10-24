@@ -1,0 +1,9 @@
+def create_user(email, password):
+    user = auth.create_user(
+        email=email,
+        password=password
+    )
+    print(f'Successfully created new user: {user.uid}')
+
+# Example call to create a user
+create_user('testuser@example.com', 'testpassword')

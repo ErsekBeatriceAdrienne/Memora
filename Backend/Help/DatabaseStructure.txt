@@ -1,0 +1,43 @@
+Database Structure
+
+1.Users Collection
+
+User Document (auto-generated ID)
+username: String
+email: String
+password: String (consider using Firebase Authentication instead)
+profile_pic: String (URL to the user's profile picture)
+friends: Array of Strings (user IDs of friends)
+Example User Document:
+{
+    "username": "john_doe",
+    "email": "john@example.com",
+    "profile_pic": "url_to_profile_pic",
+    "friends": ["user2_id", "user3_id"]
+}
+
+
+2.Events Collection
+
+Event Document (auto-generated ID)
+title: String
+date: Timestamp (date and time of the event)
+location: String (address or venue name)
+event_description: String
+invited_people: Array of Strings (user IDs of invited people)
+creator: String (user ID of the event creator)
+gallery: Array of Strings (URLs of pictures and videos)
+Example Event Document:
+{
+    "title": "Birthday Party",
+    "date": "2024-10-25T18:00:00Z",
+    "location": "John's House",
+    "event_description": "Celebrating John's 30th birthday!",
+    "invited_people": ["user1_id", "user2_id"],
+    "creator": "creator_user_id",
+    "gallery": [
+        "url_to_image1.jpg",
+        "url_to_image2.jpg",
+        "url_to_video1.mp4"
+    ]
+}
