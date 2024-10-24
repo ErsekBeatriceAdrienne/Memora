@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friends_with_memories/pages/home_page.dart';
 
 void main()
 {
@@ -67,10 +68,26 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Increment',
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(width: 16), // Space between buttons
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            },
+            tooltip: 'Go to Home Page',
+            child: const Icon(Icons.home),
+          ),
+        ],
       ),
     );
   }
