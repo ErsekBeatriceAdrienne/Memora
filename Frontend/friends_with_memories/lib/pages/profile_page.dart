@@ -1,11 +1,13 @@
+// lib/pages/profile_page.dart
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
   final String profileImageUrl;
   final String userName;
-  final List<Map<String, String>> friends; // Minden barát: {'name': 'Nev', 'imageUrl': 'KepLink'}
+  final List<Map<String, String>> friends;
 
-  ProfilePage({
+  const ProfilePage({
+    super.key,
     required this.profileImageUrl,
     required this.userName,
     required this.friends,
@@ -15,45 +17,41 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil'),
+        title: const Text('Profil'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Profilkép
             CircleAvatar(
               radius: 50,
               backgroundImage: NetworkImage(profileImageUrl),
             ),
-            SizedBox(height: 16),
-            // Felhasználó neve
+            const SizedBox(height: 16),
             Text(
               userName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            // Gombok
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Szerkesztés logika
+                    // Edit profile logic
                   },
-                  child: Text('Szerkesztés'),
+                  child: const Text('Szerkesztés'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Barát hozzáadása logika
+                    // Add friend logic
                   },
-                  child: Text('Barát hozzáadása'),
+                  child: const Text('Barát hozzáadása'),
                 ),
               ],
             ),
-            SizedBox(height: 30),
-            // Barátok listája
+            const SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
                 itemCount: friends.length,

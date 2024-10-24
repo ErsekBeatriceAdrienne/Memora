@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friends_with_memories/pages/home_page.dart';
+import 'package:friends_with_memories/pages/profile_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,18 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           FloatingActionButton(
             onPressed: () {
-              // Profil oldalra navigálás
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
-            },
-            tooltip: 'Profile',
-            child: const Icon(Icons.person),
-          ),
-          const SizedBox(width: 16), // Add space between the buttons
-          FloatingActionButton(
-            onPressed: () {
               // Vissza a Home Page-re
               Navigator.push(
                 context,
@@ -79,40 +68,3 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// Profil oldal
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profil oldal'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(
-                  'https://example.com/profile.jpg'), // Példa profilkép
-            ),
-            SizedBox(height: 16),
-            Text(
-              'John Doe', // Példa név
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Barát hozzáadása logika
-              },
-              child: Text('Barát hozzáadása'),
-            ),
-            SizedBox(height: 20),
-            // Itt lehetne a barátok listája
-          ],
-        ),
-      ),
-    );
-  }
-}

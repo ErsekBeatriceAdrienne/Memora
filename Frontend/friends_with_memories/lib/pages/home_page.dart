@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friends_with_memories/pages/profile_page.dart'; // Import ProfilePage
 
-class HomePage extends StatefulWidget
-{
+class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -9,11 +9,22 @@ class HomePage extends StatefulWidget
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // List of widgets for each tab
-  static const List<Widget> _pages = <Widget>[
-    Text('Home Page'),
-    Text('Camera Page'),
-    Text('Profile Page'),
+  // Create a list of pages, including the ProfilePage
+  static const String profileImageUrl = 'https://example.com/profile.jpg';
+  static const String userName = 'John Doe';
+  static const List<Map<String, String>> friends = [
+    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
+  ];
+
+  final List<Widget> _pages = <Widget>[
+    const Center(child: Text('Home Page')),
+    const Center(child: Text('Camera Page')),
+    ProfilePage(
+      profileImageUrl: profileImageUrl,
+      userName: userName,
+      friends: friends,
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -23,14 +34,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Page'),
       ),
       body: Center(
-        child: _pages.elementAt(_selectedIndex),
+        child: _pages.elementAt(_selectedIndex), // Display the selected page
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -60,5 +70,3 @@ void main() {
     home: HomePage(),
   ));
 }
-
-
