@@ -1,4 +1,3 @@
-// lib/pages/gallery_page.dart
 import 'package:flutter/material.dart';
 
 class GalleryPage extends StatelessWidget {

@@ -1,9 +1,9 @@
-// lib/pages/profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:friends_with_memories/pages/calendar_page.dart';
 import 'package:friends_with_memories/pages/gallery_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatelessWidget
+{
   final String profileImageUrl;
   final String userName;
   final List<Map<String, String>> friends;
@@ -16,7 +16,8 @@ class ProfilePage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),

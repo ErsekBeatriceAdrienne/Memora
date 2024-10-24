@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:friends_with_memories/pages/profile_page.dart'; // Import ProfilePage
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget
+{
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+{
   int _selectedIndex = 0;
 
   // Create a list of pages, including the ProfilePage
@@ -37,14 +39,16 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index)
+  {
     setState(() {
       _selectedIndex = index;
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Page'),
@@ -75,7 +79,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-void main() {
+void main()
+{
   runApp(MaterialApp(
     home: HomePage(),
   ));
