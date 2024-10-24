@@ -1,5 +1,7 @@
 // lib/pages/profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:friends_with_memories/pages/calendar_page.dart';
+import 'package:friends_with_memories/pages/gallery_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final String profileImageUrl;
@@ -25,13 +27,19 @@ class ProfilePage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Edit profile logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CalendarPage()),
+                    );
                   },
                   child: const Text('Calendar'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Add friend logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GalleryPage()),
+                    );
                   },
                   child: const Text('Gallery'),
                 ),
