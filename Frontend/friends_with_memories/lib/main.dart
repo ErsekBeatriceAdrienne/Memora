@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 
-void main()
-{
+void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget
-{
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -24,8 +20,7 @@ class MyApp extends StatelessWidget
   }
 }
 
-class MyHomePage extends StatefulWidget
-{
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
 
@@ -33,21 +28,9 @@ class MyHomePage extends StatefulWidget
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-{
-  int _counter = 0;
-
-  void _incrementCounter()
-  {
-    setState(()
-    {
-      _counter++;
-    });
-  }
-
+class _MyHomePageState extends State<MyHomePage> {
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -58,19 +41,59 @@ class _MyHomePageState extends State<MyHomePage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Nyomd meg a gombot, hogy a profil oldalra lépj:',
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: () {
+          // Profil oldalra navigálás
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage()),
+          );
+        },
+        tooltip: 'Profile',
+        child: const Icon(Icons.person),
+      ),
+    );
+  }
+}
+
+// Profil oldal
+class ProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profil oldal'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage(
+                  'https://example.com/profile.jpg'), // Példa profilkép
+            ),
+            SizedBox(height: 16),
+            Text(
+              'John Doe', // Példa név
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Barát hozzáadása logika
+              },
+              child: Text('Barát hozzáadása'),
+            ),
+            SizedBox(height: 20),
+            // Itt lehetne a barátok listája
+          ],
+        ),
       ),
     );
   }
