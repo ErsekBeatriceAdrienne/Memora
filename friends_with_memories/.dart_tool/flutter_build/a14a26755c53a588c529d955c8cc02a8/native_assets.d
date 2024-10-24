@@ -1,0 +1,1 @@
+ C:\\Sajat\\Egyetem\\otodikfelev\\SoftverRendszerek\\project\\Friendship_Memories_App\\friends_with_memories\\.dart_tool\\flutter_build\\a14a26755c53a588c529d955c8cc02a8\\native_assets.yaml: 
