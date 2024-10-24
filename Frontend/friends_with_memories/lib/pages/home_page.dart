@@ -30,7 +30,19 @@ class _HomePageState extends State<HomePage>
   ];
 
   final List<Widget> _pages = <Widget>[
-    const Center(child: Text('Home Page')),
+    // Home page content
+    SingleChildScrollView(  // Use SingleChildScrollView for scrolling
+      child: Column(
+        children: [
+          _buildRoundedRectangle('Event 1'),
+          _buildRoundedRectangle('Event 2'),
+          _buildRoundedRectangle('Event 3'),
+          _buildRoundedRectangle('Event 4'),
+          _buildRoundedRectangle('Event 5'),
+          _buildRoundedRectangle('Event 6'),
+        ],
+      ),
+    ),
     const Center(child: Text('Camera Page')),
     ProfilePage(
       profileImageUrl: profileImageUrl,
@@ -39,23 +51,38 @@ class _HomePageState extends State<HomePage>
     ),
   ];
 
-  void _onItemTapped(int index)
-  {
+  // Function to build larger rounded rectangles
+  static Widget _buildRoundedRectangle(String text) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+      padding: const EdgeInsets.all(30),
+      height: 130,
+      decoration: BoxDecoration(
+        color: Colors.purple[100],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 20),
+        ),
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Page'),
       ),
-      body: Center(
-        child: _pages.elementAt(_selectedIndex), // Display the selected page
-      ),
+      body: _pages.elementAt(_selectedIndex), // Switches between Home, Camera, and Profile
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -72,15 +99,14 @@ class _HomePageState extends State<HomePage>
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.purpleAccent,
         onTap: _onItemTapped,
       ),
     );
   }
 }
 
-void main()
-{
+void main() {
   runApp(MaterialApp(
     home: HomePage(),
   ));
