@@ -13,6 +13,16 @@ class _HomePageState extends State<HomePage> {
   static const String profileImageUrl = 'https://example.com/profile.jpg';
   static const String userName = 'John Doe';
   static const List<Map<String, String>> friends = [
+    {'name': '♥ Bea ♥', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': '♥ Kati ♥', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': '♥ Emi ♥', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
     {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
     {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
   ];

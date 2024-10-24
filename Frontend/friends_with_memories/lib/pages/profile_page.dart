@@ -16,14 +16,27 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Edit profile logic
+                  },
+                  child: const Text('Calendar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Add friend logic
+                  },
+                  child: const Text('Gallery'),
+                ),
+              ],
+            ),
             CircleAvatar(
               radius: 50,
               backgroundImage: NetworkImage(profileImageUrl),
