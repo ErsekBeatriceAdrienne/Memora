@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friends_with_memories/pages/calendar_page.dart';
 import 'package:friends_with_memories/pages/gallery_page.dart';
 
-class ProfilePage extends StatelessWidget
-{
+class ProfilePage extends StatelessWidget {
   final String profileImageUrl;
   final String userName;
   final List<Map<String, String>> friends;
@@ -16,16 +15,42 @@ class ProfilePage extends StatelessWidget
   });
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false, // Eltávolítja a vissza nyilat
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // Edit profile logic
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage(profileImageUrl),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              userName,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Add friend logic
+                  },
+                  child: const Text('Add Friend'),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -43,33 +68,6 @@ class ProfilePage extends StatelessWidget
                     );
                   },
                   child: const Text('Gallery'),
-                ),
-              ],
-            ),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(profileImageUrl),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              userName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Edit profile logic
-                  },
-                  child: const Text('Szerkesztés'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add friend logic
-                  },
-                  child: const Text('Barát hozzáadása'),
                 ),
               ],
             ),
