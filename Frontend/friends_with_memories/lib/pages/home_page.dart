@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:friends_with_memories/pages/profile_page.dart'; // Import ProfilePage
 
-class HomePage extends StatefulWidget
-{
+class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-{
+class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Create a list of pages, including the ProfilePage
   static const String profileImageUrl = 'https://example.com/profile.jpg';
   static const String userName = 'John Doe';
   static const List<Map<String, String>> friends = [
@@ -21,17 +18,10 @@ class _HomePageState extends State<HomePage>
     {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
     {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
     {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
-    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
-    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
-    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
-    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
-    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
-    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
   ];
 
   final List<Widget> _pages = <Widget>[
-    // Home page content
-    SingleChildScrollView(  // Use SingleChildScrollView for scrolling
+    SingleChildScrollView(
       child: Column(
         children: [
           _buildRoundedRectangle('Event 1'),
@@ -51,7 +41,6 @@ class _HomePageState extends State<HomePage>
     ),
   ];
 
-  // Function to build larger rounded rectangles
   static Widget _buildRoundedRectangle(String text) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
@@ -80,9 +69,19 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // home page text
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          _selectedIndex == 0 ? 'Home Page' :
+          _selectedIndex == 1 ? 'Camera Page' :
+          'Profile',
+        ),
       ),
-      body: _pages.elementAt(_selectedIndex), // Switches between Home, Camera, and Profile
+      body: _pages.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
