@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:friends_with_memories/pages/profile_page.dart'; // Import ProfilePage
+import 'package:friends_with_memories/pages/profile_page.dart';
+import 'package:image_picker/image_picker.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget
+{
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+{
   int _selectedIndex = 0;
+  final ImagePicker _picker = ImagePicker();
 
   static const String profileImageUrl = 'https://example.com/profile.jpg';
   static const String userName = 'John Doe';
@@ -20,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
   ];
 
-  final List<Widget> _pages = <Widget>[
+  final List<Widget> _pages = <Widget> [
     SingleChildScrollView(
       child: Column(
         children: [
@@ -59,10 +63,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _onItemTapped(int index) async {
+    if (index == 1) { // Camera page is selected
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+      if (photo != null) {
+        // Show the photo or do something with it here
+        print("Photo taken: ${photo.path}");
+      }
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
