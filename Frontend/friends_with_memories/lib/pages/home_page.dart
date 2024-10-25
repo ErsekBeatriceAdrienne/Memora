@@ -79,6 +79,9 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        // home page text
+      ),
       body: _pages.elementAt(_selectedIndex), // Switches between Home, Camera, and Profile
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
