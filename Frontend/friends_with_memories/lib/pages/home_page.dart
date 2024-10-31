@@ -19,9 +19,9 @@ class _HomePageState extends State<HomePage>
     {'name': '♥ Bea ♥', 'imageUrl': 'https://example.com/friend1.jpg'},
     {'name': '♥ Kati ♥', 'imageUrl': 'https://example.com/friend2.jpg'},
     {'name': '♥ Emi ♥', 'imageUrl': 'https://example.com/friend1.jpg'},
-    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
-    {'name': 'Friend 1', 'imageUrl': 'https://example.com/friend1.jpg'},
-    {'name': 'Friend 2', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': '♥ Gyurika ♥', 'imageUrl': 'https://example.com/friend2.jpg'},
+    {'name': 'Friend 5', 'imageUrl': 'https://example.com/friend1.jpg'},
+    {'name': 'Friend 6', 'imageUrl': 'https://example.com/friend2.jpg'},
   ];
 
   final List<Widget> _pages = <Widget> [
