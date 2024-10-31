@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "543658881237",
+    "project_id": "memoriesapp-7649b",
+    "storage_bucket": "memoriesapp-7649b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543658881237:android:ac268d1ecf34573c97725c",
+        "android_client_info": {
+          "package_name": "com.example.friends_with_memories"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANdZ4zCBfusQm6GW_8MSZ_LbgF8LmWRT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
