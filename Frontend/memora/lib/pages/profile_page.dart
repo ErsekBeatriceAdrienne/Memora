@@ -1,10 +1,10 @@
+//profile
 import 'package:flutter/material.dart';
 
 import 'calendar_page.dart';
 import 'edit_profile.dart';
 import 'friend_page.dart';
 import 'gallery_page.dart';
-
 
 class ProfilePage extends StatefulWidget {
   final String profileImageUrl;
@@ -121,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: NetworkImage(profileImageUrl),
+              backgroundImage: AssetImage('assets/images/profile.png'),
             ),
             const SizedBox(height: 16),
             Text(

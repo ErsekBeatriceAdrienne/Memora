@@ -11,12 +11,12 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   static const String profileImageUrl = 'https://example.com/profile.jpg';
-  static const String userName = 'John Doe';
+  static const String userName = 'Memora';
   static const List<Map<String, String>> friends = [
-    {'name': '♥ Bea ♥', 'imageUrl': 'images/bea.png','nickname': 'bea', 'birthday': '2002-05-16'},
-    {'name': '♥ Kati ♥', 'imageUrl': 'images/kati.png','nickname': 'kati', 'birthday': '2003-09-14'},
-    {'name': '♥ Emi ♥', 'imageUrl': 'images/emi.png','nickname': 'emi', 'birthday': '2003-08-19'},
-    {'name': '♥ Gyurika ♥', 'imageUrl': 'images/gyurika.png','nickname': 'gyuriiii', 'birthday': '1990-05-08'},
+    {'name': '♥ Bea ♥', 'imageUrl': 'assets/images/bea.png','nickname': 'bea', 'birthday': '2002-05-16'},
+    {'name': '♥ Kati ♥', 'imageUrl': 'assets/images/kati.png','nickname': 'kati', 'birthday': '2003-09-14'},
+    {'name': '♥ Emi ♥', 'imageUrl': 'assets/images/emi.png','nickname': 'emi', 'birthday': '2003-08-19'},
+    {'name': '♥ Gyurika ♥', 'imageUrl': 'assets/images/gyurika.png','nickname': 'gyuriiii', 'birthday': '1990-05-08'},
     {'name': 'Friend 5', 'imageUrl': 'https://example.com/friend1.jpg','nickname': 'Johnny', 'birthday': '1990-01-01'},
     {'name': 'Friend 6', 'imageUrl': 'https://example.com/friend2.jpg','nickname': 'Johnny', 'birthday': '1990-01-01'},
   ];

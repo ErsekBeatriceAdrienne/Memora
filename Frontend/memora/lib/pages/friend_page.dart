@@ -33,7 +33,7 @@ class FriendPage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(imageUrl),
+                  backgroundImage: AssetImage(imageUrl),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
