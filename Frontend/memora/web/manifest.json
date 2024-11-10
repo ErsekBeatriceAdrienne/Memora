@@ -1,6 +1,6 @@
 {
-    "name": "memora",
-    "short_name": "memora",
+    "name": "learn_dsa",
+    "short_name": "learn_dsa",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

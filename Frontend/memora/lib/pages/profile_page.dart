@@ -1,6 +1,5 @@
-//profile
 import 'package:flutter/material.dart';
-
+import 'package:memora/cloudinary/cloudinary_service.dart';
 import 'calendar_page.dart';
 import 'edit_profile.dart';
 import 'friend_page.dart';
@@ -26,13 +25,39 @@ class _ProfilePageState extends State<ProfilePage> {
   late String profileImageUrl;
   late String userName;
   late List<Map<String, String>> friends;
+  final _cloudinaryService = CloudinaryService();
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    profileImageUrl = widget.profileImageUrl;
     userName = widget.userName;
-    friends = List.from(widget.friends); // Deep copy to prevent modifying the original list
+    friends = List.from(widget.friends);
+    _fetchProfileImageUrl();
+  }
+
+  // Profilkép lekérése a Cloudinary-ról
+  Future<void> _fetchProfileImageUrl() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Lekérés Cloudinary-ból
+      final imageUrl = await _cloudinaryService.getProfileImageUrl(widget.userName);
+      setState(() {
+        profileImageUrl = imageUrl ?? widget.profileImageUrl;
+      });
+    } catch (e) {
+      // Hiba esetén az alapértelmezett kép URL-t használjuk
+      setState(() {
+        profileImageUrl = widget.profileImageUrl;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _addFriend() async {
@@ -70,7 +95,10 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop({'name': newFriendName, 'imageUrl': newFriendImageUrl});
+                Navigator.of(context).pop({
+                  'name': newFriendName,
+                  'imageUrl': newFriendImageUrl
+                });
               },
               child: const Text('Add'),
             ),
@@ -115,18 +143,24 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/profile.png'),
+              backgroundImage: profileImageUrl.startsWith('http')
+                  ? NetworkImage(profileImageUrl)
+                  : const AssetImage('assets/images/profile.png')
+              as ImageProvider,
             ),
             const SizedBox(height: 16),
             Text(
               userName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             Row(
@@ -140,7 +174,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CalendarPage()),
+                      MaterialPageRoute(
+                          builder: (context) => CalendarPage()),
                     );
                   },
                   child: const Text('Calendar'),
@@ -149,7 +184,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => GalleryPage()),
+                      MaterialPageRoute(
+                          builder: (context) => GalleryPage()),
                     );
                   },
                   child: const Text('Gallery'),
@@ -164,9 +200,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   final friend = friends[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: friend['imageUrl']!.startsWith('http')
+                      backgroundImage:
+                      friend['imageUrl']!.startsWith('http')
                           ? NetworkImage(friend['imageUrl']!)
-                          : AssetImage(friend['imageUrl']!) as ImageProvider,
+                          : AssetImage(friend['imageUrl']!)
+                      as ImageProvider,
                     ),
                     title: Text(friend['name']!),
                     onTap: () {

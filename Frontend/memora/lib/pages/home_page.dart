@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'event_page.dart';  // Import EventPage
-import 'profile_page.dart'; // Import ProfilePage
+import 'event_page.dart';
+import 'profile_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
+  final User user;
+  final Map<String, dynamic> userData;
+
+  const HomePage({Key? key, required this.user, required this.userData})
+      : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -10,42 +18,34 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const String profileImageUrl = 'https://example.com/profile.jpg';
-  static const String userName = 'Memora';
-  static const List<Map<String, String>> friends = [
-    {'name': '♥ Bea ♥', 'imageUrl': 'assets/images/bea.png','nickname': 'bea', 'birthday': '2002-05-16'},
-    {'name': '♥ Kati ♥', 'imageUrl': 'assets/images/kati.png','nickname': 'kati', 'birthday': '2003-09-14'},
-    {'name': '♥ Emi ♥', 'imageUrl': 'assets/images/emi.png','nickname': 'emi', 'birthday': '2003-08-19'},
-    {'name': '♥ Gyurika ♥', 'imageUrl': 'assets/images/gyurika.png','nickname': 'gyuriiii', 'birthday': '1990-05-08'},
-    {'name': 'Friend 5', 'imageUrl': 'https://example.com/friend1.jpg','nickname': 'Johnny', 'birthday': '1990-01-01'},
-    {'name': 'Friend 6', 'imageUrl': 'https://example.com/friend2.jpg','nickname': 'Johnny', 'birthday': '1990-01-01'},
-  ];
-
   late List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     _pages = <Widget>[
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildRoundedRectangle('Event 1'),
-            _buildRoundedRectangle('Event 2'),
-            _buildRoundedRectangle('Event 3'),
-            _buildRoundedRectangle('Event 4'),
-            _buildRoundedRectangle('Event 5'),
-            _buildRoundedRectangle('Event 6'),
-          ],
-        ),
-      ),
+      _buildHomeContent(),
       const Center(child: Text('Camera Page')),
       ProfilePage(
-        profileImageUrl: profileImageUrl,
-        userName: userName,
-        friends: friends,
+        profileImageUrl: widget.userData['profileImageUrl'] ?? '',
+        userName: widget.userData['username'] ?? 'N/A',
+        friends: [
+          {'name': '♥ Emi ♥', 'imageUrl': 'assets/images/emi.png', 'nickname': 'emi', 'birthday': '2002-05-16'},
+          {'name': '♥ Kati ♥', 'imageUrl': 'assets/images/kati.png', 'nickname': 'kati', 'birthday': '2003-09-14'},
+        ],
       ),
     ];
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildRoundedRectangle('Event 1'),
+          _buildRoundedRectangle('Event 2'),
+        ],
+      ),
+    );
   }
 
   Widget _buildRoundedRectangle(String text) {
@@ -61,26 +61,8 @@ class _HomePageState extends State<HomePage> {
               date: '2024-10-24',
               location: 'New York, Central Park',
               note: 'Egy példa megjegyzés az eseményhez.',
-              participants: [
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: false),
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: false),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: true),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: false),
-                Participant(profileImageUrl: 'https://example.com/friend1.jpg', isGoing: false),
-                Participant(profileImageUrl: 'https://example.com/friend2.jpg', isGoing: true),
-              ],
-              galleryImages: [
-                'https://example.com/image1.jpg',
-                'https://example.com/image2.jpg',
-                'https://example.com/image3.jpg',
-                // További képek...
-              ],
+              participants: [],
+              galleryImages: [],
             ),
           ),
         );
@@ -113,16 +95,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title: Text(
           _selectedIndex == 0 ? 'Home Page' :
-          _selectedIndex == 1 ? 'Camera Page' :
-          'Profile',
+          _selectedIndex == 1 ? 'Camera Page' : 'Profile',
         ),
       ),
       body: _pages.elementAt(_selectedIndex),
@@ -147,10 +122,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: HomePage(),
-  ));
 }
