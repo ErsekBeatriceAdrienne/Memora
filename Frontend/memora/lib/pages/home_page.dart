@@ -1,8 +1,10 @@
+//home page
 import 'package:flutter/material.dart';
-import 'event_page.dart';
-import 'profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'create_event_page.dart';
+import 'event_page.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -37,32 +39,60 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
+  // HomePage tartalom dinamikus töltése Firestore-ból
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildRoundedRectangle('Event 1'),
-          _buildRoundedRectangle('Event 2'),
-        ],
-      ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('events').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Hiba történt: ${snapshot.error}'));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text('Nincsenek események.'));
+        }
+
+        var events = snapshot.data!.docs.map((doc) {
+          var eventData = doc.data() as Map<String, dynamic>;
+          return eventData;
+        }).toList();
+
+        return SingleChildScrollView(
+          child: Column(
+            children: events.map<Widget>((event) {
+              return _buildRoundedRectangle(
+                event['eventName'] ?? 'N/A',
+                event['creatorProfileImageUrl'] ?? '',
+                event['date'] ?? 'N/A',
+                event['location'] ?? 'N/A',
+                event['note'] ?? 'N/A',
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildRoundedRectangle(String text) {
+  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => EventPage(
-              eventName: text,
-              creatorProfileImageUrl: 'https://example.com/creator.jpg',
+              eventName: eventName,
+              creatorProfileImageUrl: profileImageUrl,
               isCreator: true,
-              date: '2024-10-24',
-              location: 'New York, Central Park',
-              note: 'Egy példa megjegyzés az eseményhez.',
-              participants: [],
-              galleryImages: [],
+              date: date,
+              location: location,
+              note: note,
+              participants: [], // Dinamikusan tölthetjük fel
+              galleryImages: [], // Galéria képek
             ),
           ),
         );
@@ -77,7 +107,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Center(
           child: Text(
-            text,
+            eventName,
             style: const TextStyle(fontSize: 20),
           ),
         ),
@@ -120,6 +150,19 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: Colors.purpleAccent,
         onTap: _onItemTapped,
       ),
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateEventPage(userId: widget.user.uid),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      )
+          : null,
     );
   }
 }

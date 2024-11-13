@@ -1,14 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class EventPage extends StatelessWidget {
+class EventPage extends StatefulWidget {
   final String eventName;
   final String creatorProfileImageUrl;
   final bool isCreator;
-  final String date; // új: dátum
-  final String location; // új: helyszín
-  final String note; // új: megjegyzés
-  final List<Participant> participants; // új: résztvevők listája
-  final List<String> galleryImages; // új: galéria képek
+  final String date;
+  final String location;
+  final String note;
+  final List<String> participants; // Email címek listája
+  final List<String> galleryImages;
 
   const EventPage({
     super.key,
@@ -18,17 +19,89 @@ class EventPage extends StatelessWidget {
     required this.date,
     required this.location,
     required this.note,
-    required this.participants, // új: résztvevők
-    required this.galleryImages, // új: galéria
+    required this.participants,
+    required this.galleryImages,
   });
+
+  @override
+  _EventPageState createState() => _EventPageState();
+}
+
+class _EventPageState extends State<EventPage> {
+  final TextEditingController _emailController = TextEditingController();
+
+  Future<void> _inviteParticipant() async {
+    final email = _emailController.text.trim();
+    if (email.isNotEmpty) {
+      try {
+        // Keresés a felhasználók között a megadott email cím alapján
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isNotEmpty) {
+          // A felhasználó megtalálva
+          final userDoc = userSnapshot.docs.first;
+
+          // Keresés az események között a 'eventName' alapján
+          final eventSnapshot = await FirebaseFirestore.instance
+              .collection('events')
+              .where('eventName', isEqualTo: widget.eventName)
+              .limit(1)
+              .get();
+
+          if (eventSnapshot.docs.isNotEmpty) {
+            final eventDoc = eventSnapshot.docs.first;
+
+            // Résztvevők frissítése az esemény dokumentumában
+            await FirebaseFirestore.instance
+                .collection('events')
+                .doc(eventDoc.id)
+                .update({
+              'participants': FieldValue.arrayUnion([email]), // Email hozzáadása
+            });
+
+            // Résztvevők listájának frissítése a UI-n
+            setState(() {
+              widget.participants.add(email); // Az UI-n is frissítjük
+            });
+
+            // Töröljük az email mezőt
+            _emailController.clear();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Meghívás sikeresen elküldve!')),
+            );
+          } else {
+            // Ha nem találunk eseményt a megadott névvel
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Esemény nem található!')),
+            );
+          }
+        } else {
+          // Ha nem találunk felhasználót a megadott email címmel
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('A megadott email cím nem található!')),
+          );
+        }
+      } catch (e) {
+        print("Hiba történt a meghívás során: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hiba történt a meghívás során!')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(eventName),
+        title: Text(widget.eventName),
         actions: [
-          isCreator
+          widget.isCreator
               ? IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
@@ -37,7 +110,7 @@ class EventPage extends StatelessWidget {
           )
               : CircleAvatar(
             radius: 15,
-            backgroundImage: NetworkImage(creatorProfileImageUrl),
+            backgroundImage: NetworkImage(widget.creatorProfileImageUrl),
           ),
         ],
       ),
@@ -46,34 +119,31 @@ class EventPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Az esemény dátuma, helyszíne, megjegyzés stb.
             Row(
               children: [
                 Icon(Icons.calendar_today),
                 const SizedBox(width: 8),
                 Text(
-                  date,
+                  widget.date,
                   style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-
-            // Helyszín megjelenítése
             Row(
               children: [
                 Icon(Icons.location_on),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    location,
+                    widget.location,
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 30),
-
-            // Note megjelenítése
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -82,71 +152,56 @@ class EventPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Text(
-                note,
+                widget.note,
                 style: const TextStyle(fontSize: 18),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Résztvevők profilképei és státuszuk
+            // Meghívás email alapú
+            if (widget.isCreator)
+              Column(
+                children: [
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Meghívó email címe',
+                      hintText: 'Email cím',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _inviteParticipant,
+                    child: const Text('Meghívás'),
+                  ),
+                ],
+              ),
+
+            // Résztvevők email címek
             Text(
-              'Meghívottak:',
+              'Meghívottak: ',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
-            // Görgethető vízszintes lista a profilképeknek
-            SizedBox( // Korlátozzuk a lista magasságát
-              height: 70, // Állítsd be a kívánt magasságot
+            SizedBox(
+              height: 70,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal, // Vízszintes görgetés
-                itemCount: participants.length,
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.participants.length,
                 itemBuilder: (context, index) {
-                  final participant = participants[index];
+                  final participantEmail = widget.participants[index];
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        CircleAvatar(
-                          radius: 30, // Növeld a kör alakú képek méretét
-                          backgroundImage: NetworkImage(participant.profileImageUrl),
-                        ),
-                        // Státuszjelző
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: participant.isGoing ? Colors.green : Colors.red,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Galéria megjelenítése
-            Text(
-              'Galéria:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-
-            // Függőleges görgethető lista a galéria képeinek
-            Expanded(
-              child: ListView.builder(
-                itemCount: galleryImages.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Image.network(
-                      galleryImages[index],
-                      fit: BoxFit.cover,
+                    child: CircleAvatar(
+                      radius: 30,
+                      child: Text(
+                        participantEmail.substring(0, 2).toUpperCase(),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      backgroundColor: Colors.purple[200],
                     ),
                   );
                 },
@@ -157,14 +212,4 @@ class EventPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class Participant {
-  final String profileImageUrl;
-  final bool isGoing;
-
-  Participant({
-    required this.profileImageUrl,
-    required this.isGoing,
-  });
 }
