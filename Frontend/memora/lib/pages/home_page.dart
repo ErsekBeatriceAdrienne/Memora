@@ -1,4 +1,3 @@
-//home page
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,7 +30,8 @@ class _HomePageState extends State<HomePage>
     fetchFriendsData();
   }
 
-  Future<void> fetchFriendsData() async {
+  Future<void> fetchFriendsData() async
+  {
     List<dynamic> friendsEmails = widget.userData['friends'] ?? [];
     List<Map<String, String>> loadedFriends = [];
 
@@ -61,11 +61,11 @@ class _HomePageState extends State<HomePage>
           user: widget.user,
           userData: widget.userData,
         ),
-      ProfilePage(
-      profileImageUrl: widget.userData['profileImageUrl'] ?? '',
-      userName: widget.userData['username'] ?? 'N/A',
-      friends: friendsList,
-      ),
+        ProfilePage(
+          profileImageUrl: widget.userData['profileImageUrl'] ?? '',
+          userName: widget.userData['username'] ?? 'N/A',
+          friends: friendsList,
+        ),
       ];
     });
   }
@@ -111,7 +111,8 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note) {
+  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note)
+  {
     return GestureDetector(
       onTap: () {
         Navigator.push(
