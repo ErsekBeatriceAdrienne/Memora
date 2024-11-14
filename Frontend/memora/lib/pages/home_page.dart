@@ -22,29 +22,54 @@ class HomePage extends StatefulWidget
 class _HomePageState extends State<HomePage>
 {
   int _selectedIndex = 0;
-
   late List<Widget> _pages;
+  List<Map<String, String>> friendsList = [];
 
   @override
-  void initState()
-  {
+  void initState() {
     super.initState();
-    _pages = <Widget>[
-      _buildHomeContent(),
-      CameraPage(
-        user: widget.user,
-        userData: widget.userData,
-      ),
-      ProfilePage(
-        profileImageUrl: widget.userData['profileImageUrl'] ?? '',
-        userName: widget.userData['username'] ?? 'N/A',
-        friends: [
-          {'name': '♥ Emi ♥', 'imageUrl': 'assets/images/emi.png', 'nickname': 'emi', 'birthday': '2002-05-16'},
-          {'name': '♥ Kati ♥', 'imageUrl': 'assets/images/kati.png', 'nickname': 'kati', 'birthday': '2003-09-14'},
-        ],
-      ),
-    ];
+    fetchFriendsData();
   }
+
+  Future<void> fetchFriendsData() async {
+    List<dynamic> friendsEmails = widget.userData['friends'] ?? [];
+    List<Map<String, String>> loadedFriends = [];
+
+    for (String email in friendsEmails) {
+      final query = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        var friendData = query.docs.first.data();
+        loadedFriends.add({
+          'name': '${friendData['firstName']} ${friendData['lastName']}',
+          'imageUrl': friendData['profileImageUrl'] ?? 'assets/images/default.png',
+          'nickname': friendData['username'] ?? 'N/A',
+          'birthday': friendData['birthday'] ?? 'Unknown',
+        });
+      }
+    }
+
+    setState(() {
+      friendsList = loadedFriends;
+      _pages = <Widget>[
+        _buildHomeContent(),
+        CameraPage(
+          user: widget.user,
+          userData: widget.userData,
+        ),
+      ProfilePage(
+      profileImageUrl: widget.userData['profileImageUrl'] ?? '',
+      userName: widget.userData['username'] ?? 'N/A',
+      friends: friendsList,
+      ),
+      ];
+    });
+  }
+
 
   // HomePage tartalom dinamikus töltése Firestore-ból
   Widget _buildHomeContent()
