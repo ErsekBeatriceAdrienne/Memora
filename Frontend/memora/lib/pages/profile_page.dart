@@ -6,6 +6,7 @@ import 'calendar_page.dart';
 import 'edit_profile.dart';
 import 'friend_page.dart';
 import 'gallery_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfilePage extends StatefulWidget {
   final String profileImageUrl;
@@ -26,7 +27,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late String profileImageUrl;
   late String userName;
-  late List<Map<String, String>> friends;
+  late List<Map<String, String?>> friends; // Allow nullable values in friends map
   final _cloudinaryService = CloudinaryService();
   bool _isLoading = false;
 
@@ -35,26 +36,29 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     userName = widget.userName;
     friends = List.from(widget.friends);
+    profileImageUrl = widget.profileImageUrl; // Initialize with the passed URL
     _fetchProfileImageUrl();
   }
 
-  // Profilkép lekérése a Cloudinary-ról
+  // Fetch profile picture URL from Firestore
   Future<void> _fetchProfileImageUrl() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Lekérés Cloudinary-ból
-      final imageUrl = await _cloudinaryService.getProfileImageUrl(widget.userName);
-      setState(() {
-        profileImageUrl = imageUrl ?? widget.profileImageUrl;
-      });
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId != null) {
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+          profileImageUrl = userDoc.data()?['profileImageUrl'] ?? widget.profileImageUrl;
+        } else {
+          profileImageUrl = widget.profileImageUrl; // Fallback image if not found
+        }
+      }
     } catch (e) {
-      // Hiba esetén az alapértelmezett kép URL-t használjuk
-      setState(() {
-        profileImageUrl = widget.profileImageUrl;
-      });
+      print("Error fetching profile image from Firestore: $e");
+      profileImageUrl = widget.profileImageUrl;
     } finally {
       setState(() {
         _isLoading = false;
@@ -62,58 +66,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _addFriend() async {
-    final result = await showDialog<Map<String, String>>(
-      context: context,
-      builder: (BuildContext context) {
-        String newFriendName = '';
-        String newFriendImageUrl = '';
 
-        return AlertDialog(
-          title: const Text('Add Friend'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(hintText: 'Friend Name'),
-                onChanged: (value) {
-                  newFriendName = value;
-                },
-              ),
-              TextField(
-                decoration: const InputDecoration(hintText: 'Friend Image URL'),
-                onChanged: (value) {
-                  newFriendImageUrl = value;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop({
-                  'name': newFriendName,
-                  'imageUrl': newFriendImageUrl
-                });
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+  Future<void> _addFriend() async {
+    setState(() {
+      friends.add({'name': 'New Friend', 'imageUrl': ''}); // Default image URL as empty string
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Friend added!')),
     );
-
-    if (result != null) {
-      setState(() {
-        friends.add(result);
-      });
-    }
   }
 
   @override
@@ -122,7 +82,6 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
-
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
@@ -136,7 +95,6 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             },
           ),
-
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () async {
@@ -166,18 +124,18 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Profile picture loading
             CircleAvatar(
               radius: 50,
               backgroundImage: profileImageUrl.startsWith('http')
                   ? NetworkImage(profileImageUrl)
-                  : const AssetImage('assets/images/profile.png')
-              as ImageProvider,
+                  : const AssetImage('assets/images/profile.png') as ImageProvider,
             ),
+
             const SizedBox(height: 16),
             Text(
               userName,
-              style: const TextStyle(
-                  fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             Row(
@@ -191,8 +149,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => CalendarPage()),
+                      MaterialPageRoute(builder: (context) => CalendarPage()),
                     );
                   },
                   child: const Text('Calendar'),
@@ -201,8 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => GalleryPage()),
+                      MaterialPageRoute(builder: (context) => GalleryPage()),
                     );
                   },
                   child: const Text('Gallery'),
@@ -217,11 +173,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   final friend = friends[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage:
-                      friend['imageUrl']!.startsWith('http')
+                      backgroundImage: friend['imageUrl'] != null && friend['imageUrl']!.startsWith('http')
                           ? NetworkImage(friend['imageUrl']!)
-                          : AssetImage(friend['imageUrl']!)
-                      as ImageProvider,
+                          : const AssetImage('assets/images/default_friend.png') as ImageProvider,
                     ),
                     title: Text(friend['name']!),
                     onTap: () {
