@@ -1,9 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:cloudinary_sdk/cloudinary_sdk.dart';
 import 'cloudinary_apis.dart';
 
 class CloudinaryService {
   late Cloudinary cloudinary;
+
+  final String apiKey = CloudinaryData.apiKey;
+  final String apiSecret = CloudinaryData.apiSecret;
+  final String cloudName = CloudinaryData.cloudName;
 
   CloudinaryService()
   {
@@ -12,6 +18,35 @@ class CloudinaryService {
       apiSecret: CloudinaryData.apiSecret,
       cloudName: CloudinaryData.cloudName,
     );
+  }
+
+  Future<String?> createUploadPreset(String eventDocId) async {
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/upload_presets');
+    final headers = {
+      'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:$apiSecret'))}',
+      'Content-Type': 'application/json'
+    };
+
+    final body = json.encode({
+      'name': 'event_$eventDocId', // Preset name tied to eventDocId
+      'folder': 'events', // Folder to store the uploaded images
+      'timestamp': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      'overwrite': true,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['name']; // Return the preset name created
+      } else {
+        print('Error creating upload preset: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error creating preset: $e');
+      return null;
+    }
   }
 
   Future<String?> uploadImageUnsigned(File image, String presetName) async
