@@ -2,11 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'camera_page.dart';
 import 'create_event_page.dart';
 import 'event_page.dart';
 import 'profile_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget
+{
   final User user;
   final Map<String, dynamic> userData;
 
@@ -17,17 +19,22 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+{
   int _selectedIndex = 0;
 
   late List<Widget> _pages;
 
   @override
-  void initState() {
+  void initState()
+  {
     super.initState();
     _pages = <Widget>[
       _buildHomeContent(),
-      const Center(child: Text('Camera Page')),
+      CameraPage(
+        user: widget.user,
+        userData: widget.userData,
+      ),
       ProfilePage(
         profileImageUrl: widget.userData['profileImageUrl'] ?? '',
         userName: widget.userData['username'] ?? 'N/A',
@@ -40,7 +47,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   // HomePage tartalom dinamikus töltése Firestore-ból
-  Widget _buildHomeContent() {
+  Widget _buildHomeContent()
+  {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('events').snapshots(),
       builder: (context, snapshot) {

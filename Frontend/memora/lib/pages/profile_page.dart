@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memora/cloudinary/cloudinary_service.dart';
+import 'package:memora/pages/sign_in_page.dart';
 import 'calendar_page.dart';
 import 'edit_profile.dart';
 import 'friend_page.dart';
@@ -120,6 +122,21 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
+
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const SignInPage(),
+                  ),
+                );
+              }
+            },
+          ),
+
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () async {
