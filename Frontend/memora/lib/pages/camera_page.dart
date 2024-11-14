@@ -3,16 +3,12 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../cloudinary/cloudinary_service.dart';
-
 import '../cloudinary/cloudinary_apis.dart';
 
 class CameraPage extends StatefulWidget {
   final User user;
   final Map<String, dynamic> userData;
-
 
   const CameraPage({Key? key, required this.user, required this.userData}) : super(key: key);
 
@@ -20,7 +16,8 @@ class CameraPage extends StatefulWidget {
   _CameraPageState createState() => _CameraPageState();
 }
 
-class _CameraPageState extends State<CameraPage> {
+class _CameraPageState extends State<CameraPage>
+{
   File? _imageFile;
   List<Map<String, dynamic>> _events = [];
   int? _selectedEventIndex;
@@ -36,18 +33,30 @@ class _CameraPageState extends State<CameraPage> {
     _fetchUserEvents();
   }
 
-  Future<void> _openCamera() async {
+  Future<void> _openCamera() async
+  {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    try {
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.rear,
+      );
 
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+          print("Kép kiválasztva: ${_imageFile?.path}");
+        });
+      } else {
+        print("Nem választottál ki képet.");
+      }
+    } catch (e) {
+      print("Hiba történt a kamera megnyitásakor: $e");
     }
   }
 
-  Future<void> _fetchUserEvents() async {
+  Future<void> _fetchUserEvents() async
+  {
     try {
       final userId = widget.user.uid;
       final userEmail = widget.user.email;
@@ -64,13 +73,17 @@ class _CameraPageState extends State<CameraPage> {
 
       List<Map<String, dynamic>> events = [];
 
+      // Hozzáadjuk a docId-t az eseményekhez
       for (var doc in creatorQuerySnapshot.docs) {
-        events.add(doc.data() as Map<String, dynamic>);
+        var eventData = doc.data() as Map<String, dynamic>;
+        eventData['docId'] = doc.id; // docId hozzáadása
+        events.add(eventData);
       }
 
       for (var doc in participantQuerySnapshot.docs) {
         var eventData = doc.data() as Map<String, dynamic>;
         if (!events.any((event) => event['eventName'] == eventData['eventName'])) {
+          eventData['docId'] = doc.id; // docId hozzáadása
           events.add(eventData);
         }
       }
@@ -85,46 +98,41 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _uploadImageToCloudinary() async {
     if (_imageFile == null || _selectedEventIndex == null) {
-      print('No image selected or event selected');
+      print('Nincs kép kiválasztva vagy esemény kiválasztva');
       return;
     }
 
     try {
       final event = _events[_selectedEventIndex!];
-      final eventDocId = event['docId'];
-      final imageUrl = await _uploadImage(_imageFile!, eventDocId);
+      final eventDocId = event['docId'] ?? '';
 
-      if (imageUrl != null && imageUrl.isNotEmpty) {
-        print('Image uploaded successfully: $imageUrl');
-
-        // Update Firestore with the image URL only if it's valid
-        await FirebaseFirestore.instance.collection('events').doc(eventDocId).update({
-          'imageUrl': imageUrl,
-        });
-
-        print('Image uploaded successfully and saved to Firestore');
-      } else {
-        print('Image upload failed, URL is null or empty');
+      if (eventDocId.isEmpty) {
+        print('Az esemény azonosítója (docId) nem található.');
+        return;
       }
+
+      // Használjuk a presetName-t és az event ID-t az upload függvényben
+      final imageUrl = await cloudinaryService.uploadImageForEvent(
+        _imageFile!,
+        CloudinaryData.presetNameEvents,
+        eventDocId,
+      );
     } catch (e) {
-      print('Error uploading image: $e');
+      print('Hiba a kép feltöltésekor: $e');
     }
   }
 
-  Future<String?> _uploadImage(File imageFile, String eventDocId) async {
+  Future<String?> _uploadImage(File imageFile, String uploadPreset) async {
     try {
-      // Get the upload preset for the event
-      String? presetName = await cloudinaryService.createUploadPreset(eventDocId);
-      if (presetName == null) {
-        print('Failed to create upload preset.');
+      if (uploadPreset.isEmpty) {
+        print('Upload preset nem lehet üres.');
         return null;
       }
 
-      // Upload the image and get the URL
-      final imageUrl = await cloudinaryService.uploadImageUnsigned(imageFile, presetName);
+      final imageUrl = await cloudinaryService.uploadImageUnsigned(imageFile, uploadPreset);
       return imageUrl;
     } catch (e) {
-      print('Error uploading image: $e');
+      print('Hiba a kép feltöltésekor: $e');
       return null;
     }
   }
