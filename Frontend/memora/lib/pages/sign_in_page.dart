@@ -5,16 +5,14 @@ import 'package:memora/pages/registration_page.dart';
 
 import 'home_page.dart';
 
-class SignInPage extends StatefulWidget
-{
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage>
-{
+class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -23,6 +21,14 @@ class _SignInPageState extends State<SignInPage>
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    // Alapértelmezett értékek beállítása a teszteléshez
+    _emailController.text = 'emily@gmail.com';
+    _passwordController.text = '123456';
+  }
 
   @override
   Widget build(BuildContext context) {
