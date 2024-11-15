@@ -8,7 +8,6 @@ class EventPage extends StatefulWidget {
   final String date;
   final String location;
   final String note;
-  final List<String> participants; // Email címek listája
   final List<String> galleryImages;
 
   const EventPage({
@@ -19,7 +18,6 @@ class EventPage extends StatefulWidget {
     required this.date,
     required this.location,
     required this.note,
-    required this.participants,
     required this.galleryImages,
   });
 
@@ -29,6 +27,58 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   final TextEditingController _emailController = TextEditingController();
+  List<Map<String, String>> participantsData = []; // Tárolja a résztvevők adatait
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchParticipants();
+  }
+
+  Future<void> _fetchParticipants() async {
+    try {
+      // Lekérjük az eseményt az adatbázisból
+      final eventSnapshot = await FirebaseFirestore.instance
+          .collection('events')
+          .where('eventName', isEqualTo: widget.eventName)
+          .limit(1)
+          .get();
+
+      if (eventSnapshot.docs.isNotEmpty) {
+        final eventDoc = eventSnapshot.docs.first;
+        final participantsEmails = List<String>.from(eventDoc.data()['participants'] ?? []);
+
+        // Résztvevők adatainak lekérése
+        final List<Map<String, String>> fetchedParticipants = [];
+        for (var email in participantsEmails) {
+          final userSnapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .where('email', isEqualTo: email)
+              .limit(1)
+              .get();
+
+          if (userSnapshot.docs.isNotEmpty) {
+            final userData = userSnapshot.docs.first.data();
+            fetchedParticipants.add({
+              'email': email,
+              'imageUrl': userData['profileImageUrl'] ?? '',
+            });
+          }
+        }
+
+        setState(() {
+          participantsData = fetchedParticipants;
+        });
+      }
+    } catch (e) {
+      print('Hiba a résztvevők lekérésekor: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<void> _inviteParticipant() async {
     final email = _emailController.text.trim();
@@ -42,7 +92,6 @@ class _EventPageState extends State<EventPage> {
             .get();
 
         if (userSnapshot.docs.isNotEmpty) {
-          // A felhasználó megtalálva
           final userDoc = userSnapshot.docs.first;
 
           // Keresés az események között a 'eventName' alapján
@@ -60,36 +109,37 @@ class _EventPageState extends State<EventPage> {
                 .collection('events')
                 .doc(eventDoc.id)
                 .update({
-              'participants': FieldValue.arrayUnion([email]), // Email hozzáadása
+              'participants': FieldValue.arrayUnion([email]),
             });
 
-            // Résztvevők listájának frissítése a UI-n
+            // Résztvevők frissítése az UI-n
             setState(() {
-              widget.participants.add(email); // Az UI-n is frissítjük
+              participantsData.add({
+                'email': email,
+                'imageUrl': userDoc.data()['profileImageUrl'] ?? '',
+              });
             });
 
             // Töröljük az email mezőt
             _emailController.clear();
 
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Meghívás sikeresen elküldve!')),
+              const SnackBar(content: Text('Meghívás sikeresen elküldve!')),
             );
           } else {
-            // Ha nem találunk eseményt a megadott névvel
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Esemény nem található!')),
+              const SnackBar(content: Text('Esemény nem található!')),
             );
           }
         } else {
-          // Ha nem találunk felhasználót a megadott email címmel
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('A megadott email cím nem található!')),
+            const SnackBar(content: Text('A megadott email cím nem található!')),
           );
         }
       } catch (e) {
-        print("Hiba történt a meghívás során: $e");
+        print('Hiba történt a meghívás során: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hiba történt a meghívás során!')),
+          const SnackBar(content: Text('Hiba történt a meghívás során!')),
         );
       }
     }
@@ -103,7 +153,7 @@ class _EventPageState extends State<EventPage> {
         actions: [
           widget.isCreator
               ? IconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: () {
               // Szerkesztési logika
             },
@@ -114,7 +164,9 @@ class _EventPageState extends State<EventPage> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,23 +174,23 @@ class _EventPageState extends State<EventPage> {
             // Az esemény dátuma, helyszíne, megjegyzés stb.
             Row(
               children: [
-                Icon(Icons.calendar_today),
+                const Icon(Icons.calendar_today),
                 const SizedBox(width: 8),
                 Text(
                   widget.date,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.location_on),
+                const Icon(Icons.location_on),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     widget.location,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -162,10 +214,9 @@ class _EventPageState extends State<EventPage> {
             if (widget.isCreator)
               Column(
                 children: [
-                  const SizedBox(height: 20),
                   TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Meghívó email címe',
                       hintText: 'Email cím',
                       border: OutlineInputBorder(),
@@ -177,31 +228,32 @@ class _EventPageState extends State<EventPage> {
                     onPressed: _inviteParticipant,
                     child: const Text('Meghívás'),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
 
-            // Résztvevők email címek
+            // Résztvevők listája vízszintesen
             Text(
-              'Meghívottak: ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Meghívottak:',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             SizedBox(
               height: 70,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: widget.participants.length,
+                itemCount: participantsData.length,
                 itemBuilder: (context, index) {
-                  final participantEmail = widget.participants[index];
+                  final participant = participantsData[index];
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CircleAvatar(
                       radius: 30,
-                      child: Text(
-                        participantEmail.substring(0, 2).toUpperCase(),
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                      backgroundColor: Colors.purple[200],
+                      backgroundImage: participant['imageUrl'] != null &&
+                          participant['imageUrl']!.isNotEmpty
+                          ? NetworkImage(participant['imageUrl']!)
+                          : const AssetImage('assets/images/default_friend.png')
+                      as ImageProvider,
                     ),
                   );
                 },

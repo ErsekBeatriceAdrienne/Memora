@@ -125,7 +125,6 @@ class _HomePageState extends State<HomePage>
               date: date,
               location: location,
               note: note,
-              participants: [], // Dinamikusan tölthetjük fel
               galleryImages: [], // Galéria képek
             ),
           ),
