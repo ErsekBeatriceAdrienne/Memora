@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../map/map_picker.dart';
+
 class EditEventPage extends StatefulWidget {
   final String eventName;
   final String date;
@@ -124,14 +126,30 @@ class _EditEventPageState extends State<EditEventPage> {
                 onTap: () => _selectDate(context),
               ),
               const SizedBox(height: 16),
-              // Helyszín
+              /// Helyszín
               TextField(
                 controller: _locationController,
+                readOnly: true,
                 decoration: const InputDecoration(
                   labelText: 'Location',
                   border: OutlineInputBorder(),
                 ),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPickerPage(),
+                    ),
+                  );
+
+                  if (result != null && result['location'] != null) {
+                    setState(() {
+                      _locationController.text = result['location'];
+                    });
+                  }
+                },
               ),
+
               const SizedBox(height: 16),
               // Megjegyzés
               TextField(
