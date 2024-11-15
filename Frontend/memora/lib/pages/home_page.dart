@@ -103,6 +103,7 @@ class _HomePageState extends State<HomePage>
                 event['date'] ?? 'N/A',
                 event['location'] ?? 'N/A',
                 event['note'] ?? 'N/A',
+                event['creatorId'] ?? '',
               );
             }).toList(),
           ),
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note)
+  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note, String creatorId)
   {
     return GestureDetector(
       onTap: () {
@@ -121,7 +122,8 @@ class _HomePageState extends State<HomePage>
             builder: (context) => EventPage(
               eventName: eventName,
               creatorProfileImageUrl: profileImageUrl,
-              isCreator: true,
+              isCreator: widget.user.uid == creatorId,
+              creatorId: creatorId,
               date: date,
               location: location,
               note: note,
@@ -129,6 +131,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         );
+
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),

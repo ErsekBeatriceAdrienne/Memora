@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'edit_event_page.dart';
 
 class EventPage extends StatefulWidget {
   final String eventName;
   final String creatorProfileImageUrl;
   final bool isCreator;
+  final String creatorId; // Új paraméter
   final String date;
   final String location;
   final String note;
@@ -15,6 +19,7 @@ class EventPage extends StatefulWidget {
     required this.eventName,
     required this.creatorProfileImageUrl,
     required this.isCreator,
+    required this.creatorId, // Új paraméter inicializálása
     required this.date,
     required this.location,
     required this.note,
@@ -27,16 +32,28 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   final TextEditingController _emailController = TextEditingController();
-  List<Map<String, String>> participantsData = []; // Tárolja a résztvevők adatait
+  List<Map<String, String>> participantsData = [];
   bool _isLoading = true;
+  String? currentUserId;
 
   @override
   void initState() {
     super.initState();
     _fetchParticipants();
+    _getCurrentUserId();
   }
 
-  Future<void> _fetchParticipants() async {
+  Future<void> _getCurrentUserId() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUserId = user.uid;
+      });
+    }
+  }
+
+  Future<void> _fetchParticipants() async
+  {
     try {
       // Lekérjük az eseményt az adatbázisból
       final eventSnapshot = await FirebaseFirestore.instance
@@ -151,11 +168,22 @@ class _EventPageState extends State<EventPage> {
       appBar: AppBar(
         title: Text(widget.eventName),
         actions: [
-          widget.isCreator
+          // Csak akkor jelenik meg az edit gomb, ha a `creatorId` megegyezik a `currentUserId`-val
+          (widget.creatorId == currentUserId)
               ? IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // Szerkesztési logika
+              // Navigáció az EditEventPage-re
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditEventPage(
+                    eventName: widget.eventName,
+                    date: widget.date,
+                    location: widget.location,
+                    note: widget.note,
+                  ),
+                ),
+              );
             },
           )
               : CircleAvatar(
