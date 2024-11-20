@@ -30,8 +30,7 @@ class _HomePageState extends State<HomePage>
     fetchFriendsData();
   }
 
-  Future<void> fetchFriendsData() async
-  {
+  Future<void> fetchFriendsData() async {
     List<dynamic> friendsEmails = widget.userData['friends'] ?? [];
     List<Map<String, String>> loadedFriends = [];
 

@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:memora/cloudinary/cloudinary_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:memora/pages/sign_in_page.dart';
 import 'calendar_page.dart';
 import 'edit_profile.dart';
 import 'friend_page.dart';
 import 'gallery_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfilePage extends StatefulWidget {
   final String profileImageUrl;
@@ -28,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String profileImageUrl;
   late String userName;
   late List<Map<String, String?>> friends; // Allow nullable values in friends map
-  final _cloudinaryService = CloudinaryService();
+  final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -37,28 +36,51 @@ class _ProfilePageState extends State<ProfilePage> {
     userName = widget.userName;
     friends = List.from(widget.friends);
     profileImageUrl = widget.profileImageUrl; // Initialize with the passed URL
-    _fetchProfileImageUrl();
   }
 
-  // Fetch profile picture URL from Firestore
-  Future<void> _fetchProfileImageUrl() async {
-    setState(() {
-      _isLoading = true;
-    });
-
+  Future<void> _addFriend(String email) async {
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId != null) {
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-          profileImageUrl = userDoc.data()?['profileImageUrl'] ?? widget.profileImageUrl;
-        } else {
-          profileImageUrl = widget.profileImageUrl; // Fallback image if not found
+      setState(() {
+        _isLoading = true;
+      });
+
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (userSnapshot.docs.isNotEmpty) {
+        final userData = userSnapshot.docs.first.data();
+
+        final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+        if (currentUserId != null) {
+          await FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
+            'friends': FieldValue.arrayUnion([email]),
+          });
+
+          setState(() {
+            friends.add({
+              'name': userData['name'] ?? 'Unknown',
+              'imageUrl': userData['profileImageUrl'] ?? '',
+              'email': email,
+            });
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Barát sikeresen hozzáadva!')),
+          );
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('A megadott email cím nem található!')),
+        );
       }
     } catch (e) {
-      print("Error fetching profile image from Firestore: $e");
-      profileImageUrl = widget.profileImageUrl;
+      print('Hiba a barát hozzáadásakor: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hiba történt a barát hozzáadásakor!')),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -66,13 +88,41 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
-  Future<void> _addFriend() async {
-    setState(() {
-      friends.add({'name': 'New Friend', 'imageUrl': ''}); // Default image URL as empty string
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Friend added!')),
+  void _showAddFriendDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Friend'),
+          content: TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(
+              labelText: 'Email cím',
+              hintText: 'Adja meg a barát email címét',
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Mégse'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final email = _emailController.text.trim();
+                if (email.isNotEmpty) {
+                  Navigator.pop(context); // Bezárja a párbeszédablakot
+                  await _addFriend(email);
+                  _emailController.clear(); // Tisztítja a mezőt
+                }
+              },
+              child: const Text('Hozzáadás'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -124,14 +174,12 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Profile picture loading
             CircleAvatar(
               radius: 50,
               backgroundImage: profileImageUrl.startsWith('http')
                   ? NetworkImage(profileImageUrl)
-                  : const AssetImage('assets/images/profile.png') as ImageProvider,
+                  : const AssetImage('assets/images/gyurika.png') as ImageProvider,
             ),
-
             const SizedBox(height: 16),
             Text(
               userName,
@@ -142,7 +190,7 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: _addFriend,
+                  onPressed: _showAddFriendDialog,
                   child: const Text('Add Friend'),
                 ),
                 ElevatedButton(
@@ -175,19 +223,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     leading: CircleAvatar(
                       backgroundImage: friend['imageUrl'] != null && friend['imageUrl']!.startsWith('http')
                           ? NetworkImage(friend['imageUrl']!)
-                          : const AssetImage('assets/images/default_friend.png') as ImageProvider,
+                          : const AssetImage('assets/images/gyurika.png') as ImageProvider,
                     ),
-                    title: Text(friend['name']!),
+                    title: Text(friend['name'] ?? 'Unknown'),
                     onTap: () {
+                      // Logoljuk a kiválasztott barát teljes adatát (a barát emailje, neve és egyéb adatok)
+                      print('Kiválasztott barát adatainak átadása: ${friend}');
+
+                      // Navigálás a barát adatainak megjelenítésére
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FriendPage(
-                            name: friend['name']!,
-                            nickname: friend['nickname'] ?? 'N/A',
-                            birthday: friend['birthday'] ?? 'N/A',
-                            areFriends: true,
-                            imageUrl: friend['imageUrl']!,
+                            friendData: friend, // Az egész barát adatát átadjuk
                           ),
                         ),
                       );
@@ -195,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
