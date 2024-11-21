@@ -72,8 +72,7 @@ class _HomePageState extends State<HomePage>
 
 
   // HomePage tartalom dinamikus töltése Firestore-ból
-  Widget _buildHomeContent()
-  {
+  Widget _buildHomeContent() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('events').snapshots(),
       builder: (context, snapshot) {
@@ -91,6 +90,7 @@ class _HomePageState extends State<HomePage>
 
         var events = snapshot.data!.docs.map((doc) {
           var eventData = doc.data() as Map<String, dynamic>;
+          eventData['eventId'] = doc.id; // Add eventId from Firestore
           return eventData;
         }).toList();
 
@@ -98,6 +98,7 @@ class _HomePageState extends State<HomePage>
           child: Column(
             children: events.map<Widget>((event) {
               return _buildRoundedRectangle(
+                event['eventId'], // Pass eventId
                 event['eventName'] ?? 'N/A',
                 event['creatorProfileImageUrl'] ?? '',
                 event['date'] ?? 'N/A',
@@ -112,14 +113,23 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildRoundedRectangle(String eventName, String profileImageUrl, String date, String location, String note, String creatorId)
-  {
+
+  Widget _buildRoundedRectangle(
+      String eventId,
+      String eventName,
+      String profileImageUrl,
+      String date,
+      String location,
+      String note,
+      String creatorId,
+      ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => EventPage(
+              eventId: eventId,
               eventName: eventName,
               creatorProfileImageUrl: profileImageUrl,
               isCreator: widget.user.uid == creatorId,
@@ -127,11 +137,10 @@ class _HomePageState extends State<HomePage>
               date: date,
               location: location,
               note: note,
-              galleryImages: [], // Galéria képek
+              galleryImages: [], // Placeholder for gallery images
             ),
           ),
         );
-
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
@@ -150,6 +159,7 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+
 
   void _onItemTapped(int index) {
     setState(() {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'edit_event_page.dart';
 
 class EventPage extends StatefulWidget {
+  final String eventId;
   final String eventName;
   final String creatorProfileImageUrl;
   final bool isCreator;
@@ -16,6 +17,7 @@ class EventPage extends StatefulWidget {
 
   const EventPage({
     super.key,
+    required this.eventId,
     required this.eventName,
     required this.creatorProfileImageUrl,
     required this.isCreator,
@@ -177,10 +179,12 @@ class _EventPageState extends State<EventPage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => EditEventPage(
+                    eventId: widget.eventId,
                     eventName: widget.eventName,
                     date: widget.date,
                     location: widget.location,
                     note: widget.note,
+                    invitedPeople: participantsData.map((participant) => participant['email'] ?? '').toList(),
                   ),
                 ),
               );
