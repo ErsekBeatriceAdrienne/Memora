@@ -1,82 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FriendPage extends StatefulWidget {
-  final Map<String, String?> friendData; // A barát adatainak tárolása
+class FriendPage extends StatelessWidget {
+  final String friendEmail;
 
-  const FriendPage({
-    Key? key,
-    required this.friendData, // A barát adatainak átadása
-  }) : super(key: key);
+  const FriendPage({super.key, required this.friendEmail});
 
-  @override
-  _FriendPageState createState() => _FriendPageState();
-}
+  Future<Map<String, dynamic>> _fetchFriendData() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(friendEmail)
+        .get();
 
-class _FriendPageState extends State<FriendPage> {
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Itt lehetne adatlekérés, de mivel már átadjuk a teljes barát adatot, nincs szükség adatbázis lekérésre.
+    if (snapshot.exists) {
+      return snapshot.data()!;
+    } else {
+      throw Exception('Friend not found');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final friendData = widget.friendData; // A barát adatai
-
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Loading...'),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(friendData['name'] ?? 'Friend Details'), // A barát neve, ha van
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profilkép és adatok megjelenítése
-            Row(
+      appBar: AppBar(title: const Text('Friend Details')),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _fetchFriendData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No data found'));
+          }
+
+          final friendData = snapshot.data!;
+          final profileImageUrl = friendData['profileImageUrl'] as String?;
+          final fullName =
+          '${friendData['firstName'] ?? ''} ${friendData['lastName'] ?? ''}'.trim();
+          final friendshipDate = friendData['friendshipDate'] ?? 'Unknown';
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: friendData['imageUrl'] != null && friendData['imageUrl']!.startsWith('http')
-                      ? NetworkImage(friendData['imageUrl']!)
-                      : const AssetImage('assets/images/gyurika.png') as ImageProvider,
+                  backgroundImage: profileImageUrl != null && profileImageUrl.startsWith('http')
+                      ? NetworkImage(profileImageUrl)
+                      : const AssetImage('assets/images/default_friend.png') as ImageProvider,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Name: ${friendData['name'] ?? 'N/A'}'), // Barát neve
-                      Text('Email: ${friendData['email'] ?? 'N/A'}'), // Barát email cím
-                    ],
-                  ),
+                const SizedBox(height: 16),
+                Text(
+                  fullName,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 10),
+                Text('Friend since: $friendshipDate'),
+                const SizedBox(height: 30),
+                Text('Email: $friendEmail'),
               ],
             ),
-            const SizedBox(height: 30),
-            // Bármilyen további adat megjelenítése, ha szükséges
-            const Text(
-              'Friend Details',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 10),
-            // Itt további információk is elhelyezhetőek, ha szükséges
-            // Például a barát születési dátuma, cím stb.
-          ],
-        ),
+          );
+        },
       ),
     );
   }

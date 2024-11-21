@@ -61,9 +61,7 @@ class _HomePageState extends State<HomePage>
           userData: widget.userData,
         ),
         ProfilePage(
-          profileImageUrl: widget.userData['profileImageUrl'] ?? '',
-          userName: widget.userData['username'] ?? 'N/A',
-          friends: friendsList,
+          email: widget.userData['email'] ?? '',
         ),
       ];
     });
