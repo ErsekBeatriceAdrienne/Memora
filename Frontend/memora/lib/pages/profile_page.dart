@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'friend_page.dart';
+import 'friend_page.dart'; // Importáljuk a FriendPage-et
 
 class ProfilePage extends StatefulWidget {
-  final User user; // Pass the entire user object
+  final User user;
 
   const ProfilePage({super.key, required this.user});
 
@@ -24,10 +24,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
-      // Fetch user data based on user ID (provided by Firebase User object)
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid) // Use user.uid to query the correct document
+          .doc(widget.user.uid)
           .get();
 
       if (snapshot.exists) {
@@ -36,7 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
           userData = data;
         });
 
-        // Fetch friends data using the list of friends' emails
         final friendsEmails = (data['friends'] as List<dynamic>).cast<String>();
         await _fetchFriendsData(friendsEmails);
       }
@@ -46,41 +44,34 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _fetchFriendsData(List<String> emails) async {
-    final List<Map<String, String?>> fetchedData = [];
+    try {
+      final List<Map<String, String?>> fetchedData = [];
 
-    for (final email in emails) {
-      try {
-        final snapshot = await FirebaseFirestore.instance
+      for (String email in emails) {
+        final querySnapshot = await FirebaseFirestore.instance
             .collection('users')
-            .doc(email)
+            .where('email', isEqualTo: email)
+            .limit(1)
             .get();
 
-        if (snapshot.exists) {
-          final data = snapshot.data()!;
+        if (querySnapshot.docs.isNotEmpty) {
+          final friendData = querySnapshot.docs.first.data();
+
           fetchedData.add({
-            'email': email,
-            'username': data['username'] as String?,
-            'imageUrl': data['profileImageUrl'] as String?,
-          });
-        } else {
-          fetchedData.add({
-            'email': email,
-            'username': 'Unknown User',
-            'imageUrl': null,
+            'email': friendData['email'] as String?,
+            'username':
+            '${friendData['firstName'] ?? ''} ${friendData['lastName'] ?? ''}',
+            'imageUrl': friendData['profileImageUrl'] as String?,
           });
         }
-      } catch (e) {
-        fetchedData.add({
-          'email': email,
-          'username': 'Unknown User',
-          'imageUrl': null,
-        });
       }
-    }
 
-    setState(() {
-      friendsData = fetchedData;
-    });
+      setState(() {
+        friendsData = fetchedData;
+      });
+    } catch (e) {
+      print('Error during friends data fetch: $e');
+    }
   }
 
   @override
@@ -105,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 10),
           Text(
-            userData!['firstName'] + ' ' + userData!['lastName'],
+            '${userData!['firstName']} ${userData!['lastName']}',
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Text(
@@ -128,6 +119,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   title: Text(friend['username'] ?? 'Unknown User'),
                   subtitle: Text(friend['email'] ?? 'No email'),
+                  onTap: () {
+                    // Navigáció a FriendPage-re
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FriendPage(
+                          username: friend['username'] ?? 'Unknown User',
+                          email: friend['email'] ?? 'No email',
+                          imageUrl: friend['imageUrl'],
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
