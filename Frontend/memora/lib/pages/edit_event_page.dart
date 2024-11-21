@@ -96,7 +96,7 @@ class _EditEventPageState extends State<EditEventPage> {
 
     try {
       // Esemény dokumentumának frissítése a Firestore-ban
-      await FirebaseFirestore.instance.collection('events').doc(widget.eventId.toString()).update({
+      await FirebaseFirestore.instance.collection('events').doc(widget.eventId).update({
         'eventName': updatedEventName,
         'date': updatedDate,
         'location': updatedLocation,
