@@ -1,11 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'friend_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String email; // Az email alapján azonosítjuk a felhasználót
+  final User user; // Pass the entire user object
 
-  const ProfilePage({super.key, required this.email});
+  const ProfilePage({super.key, required this.user});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -23,10 +24,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
-      // Felhasználó adatainak lekérdezése az email alapján
+      // Fetch user data based on user ID (provided by Firebase User object)
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.email)
+          .doc(widget.user.uid) // Use user.uid to query the correct document
           .get();
 
       if (snapshot.exists) {
@@ -35,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
           userData = data;
         });
 
-        // Barátok adatainak lekérdezése
+        // Fetch friends data using the list of friends' emails
         final friendsEmails = (data['friends'] as List<dynamic>).cast<String>();
         await _fetchFriendsData(friendsEmails);
       }
@@ -91,9 +92,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
       body: Column(
         children: [
           const SizedBox(height: 20),
@@ -102,14 +100,20 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundImage: userData!['profileImageUrl'] != null &&
                 userData!['profileImageUrl'].startsWith('http')
                 ? NetworkImage(userData!['profileImageUrl'])
-                : const AssetImage('assets/images/profile.png') as ImageProvider,
+                : const AssetImage('assets/images/default.png')
+            as ImageProvider,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
-            userData!['username'] ?? 'Unknown User',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            userData!['firstName'] + ' ' + userData!['lastName'],
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 30),
+          Text(
+            'Username: ${userData!['username']}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 20),
+          const Text('Friends:', style: TextStyle(fontSize: 18)),
           Expanded(
             child: ListView.builder(
               itemCount: friendsData.length,
@@ -119,18 +123,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   leading: CircleAvatar(
                     backgroundImage: friend['imageUrl'] != null
                         ? NetworkImage(friend['imageUrl']!)
-                        : const AssetImage('assets/images/default_friend.png') as ImageProvider,
+                        : const AssetImage('assets/images/default.png')
+                    as ImageProvider,
                   ),
                   title: Text(friend['username'] ?? 'Unknown User'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            FriendPage(friendEmail: friend['email']!),
-                      ),
-                    );
-                  },
+                  subtitle: Text(friend['email'] ?? 'No email'),
                 );
               },
             ),
