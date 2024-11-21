@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'friend_page.dart'; // Importáljuk a FriendPage-et
+
+import 'calendar_page.dart';
+import 'friend_page.dart';
+import 'gallery_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final User user;
+  final User user; // Pass the entire user object
 
   const ProfilePage({super.key, required this.user});
 
@@ -24,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
+      // Felhasználói adatok lekérése az aktuális felhasználói UID alapján
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user.uid)
@@ -35,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
           userData = data;
         });
 
+        // Barátok email címeinek lekérése és feldolgozása
         final friendsEmails = (data['friends'] as List<dynamic>).cast<String>();
         await _fetchFriendsData(friendsEmails);
       }
@@ -45,23 +50,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchFriendsData(List<String> emails) async {
     try {
+      // Barátok adatainak lekérdezése az adatbázisból
       final List<Map<String, String?>> fetchedData = [];
-
-      for (String email in emails) {
+      for (final email in emails) {
         final querySnapshot = await FirebaseFirestore.instance
             .collection('users')
             .where('email', isEqualTo: email)
-            .limit(1)
             .get();
 
         if (querySnapshot.docs.isNotEmpty) {
           final friendData = querySnapshot.docs.first.data();
 
+          // Az 'birthday' mezőt Timestamp típusúra konvertáljuk, majd String formátumba
+          final birthday = friendData['birthday'] != null
+              ? (friendData['birthday'] as Timestamp).toDate().toString()
+              : 'Unknown birthday';
+
           fetchedData.add({
-            'email': friendData['email'] as String?,
-            'username':
-            '${friendData['firstName'] ?? ''} ${friendData['lastName'] ?? ''}',
+            'email': email,
+            'fullname': friendData['firstName'] + ' ' + friendData['lastName'],
             'imageUrl': friendData['profileImageUrl'] as String?,
+            'username': friendData['username'] ?? 'No nickname',
+            'birthday': birthday,
           });
         }
       }
@@ -73,6 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
       print('Error during friends data fetch: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +107,70 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 10),
           Text(
-            '${userData!['firstName']} ${userData!['lastName']}',
+            userData!['firstName'] + ' ' + userData!['lastName'],
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Text(
-            'Username: ${userData!['username']}',
+            '${userData!['username']}',
             style: const TextStyle(fontSize: 18),
+          ),
+
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Add Friend'),
+                      content: const TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Enter email address',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Add friend logic
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Add Friend'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CalendarPage(),
+                    ),
+                  );
+                },
+                child: const Text('Calendar'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GalleryPage(),
+                    ),
+                  );
+                },
+                child: const Text('Gallery'),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           const Text('Friends:', style: TextStyle(fontSize: 18)),
@@ -117,17 +186,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         : const AssetImage('assets/images/default.png')
                     as ImageProvider,
                   ),
-                  title: Text(friend['username'] ?? 'Unknown User'),
+                  title: Text(friend['fullname'] ?? 'Unknown User'),
                   subtitle: Text(friend['email'] ?? 'No email'),
                   onTap: () {
-                    // Navigáció a FriendPage-re
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => FriendPage(
-                          username: friend['username'] ?? 'Unknown User',
+                          fullname: friend['fullname'] ?? 'Unknown User',
                           email: friend['email'] ?? 'No email',
                           imageUrl: friend['imageUrl'],
+                          username: friend['username'] ?? 'No nickname',
+                          birthday: friend['birthday'] ?? 'Unknown birthday',
                         ),
                       ),
                     );
