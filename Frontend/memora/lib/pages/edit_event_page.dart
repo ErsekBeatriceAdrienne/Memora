@@ -159,12 +159,6 @@ class _EditEventPageState extends State<EditEventPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Event: ${widget.eventName}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveEvent,
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

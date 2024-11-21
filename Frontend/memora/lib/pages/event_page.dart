@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'edit_event_page.dart';
 
 class EventPage extends StatefulWidget {
@@ -21,7 +20,7 @@ class EventPage extends StatefulWidget {
     required this.eventName,
     required this.creatorProfileImageUrl,
     required this.isCreator,
-    required this.creatorId, // Initialize the new parameter
+    required this.creatorId,
     required this.date,
     required this.location,
     required this.note,
@@ -38,25 +37,10 @@ class _EventPageState extends State<EventPage> {
   bool _isLoading = true;
   String? currentUserId;
 
-  // Add state variables to hold updated event data
-  late String eventName;
-  late String date;
-  late String location;
-  late String note;
-  late List<String> galleryImages;
-
   @override
   void initState() {
     super.initState();
-    _fetchParticipants();
     _getCurrentUserId();
-
-    // Initialize state with widget data
-    eventName = widget.eventName;
-    date = widget.date;
-    location = widget.location;
-    note = widget.note;
-    galleryImages = widget.galleryImages;
   }
 
   Future<void> _getCurrentUserId() async {
@@ -68,12 +52,77 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
-  Future<void> _fetchParticipants() async {
-    // Your participant fetching logic
+  Stream<DocumentSnapshot> _eventStream() {
+    return FirebaseFirestore.instance
+        .collection('events')
+        .doc(widget.eventId)
+        .snapshots();
+  }
+
+  Stream<List<Map<String, String>>> _participantsStream() async* {
+    final eventSnapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .doc(widget.eventId)
+        .get();
+
+    final participantsEmails = List<String>.from(eventSnapshot.data()?['participants'] ?? []);
+    final participantsList = <Map<String, String>>[];
+
+    for (var email in participantsEmails) {
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (userSnapshot.docs.isNotEmpty) {
+        final userData = userSnapshot.docs.first.data();
+        participantsList.add({
+          'email': email,
+          'imageUrl': userData['profileImageUrl'] ?? '',
+        });
+      }
+    }
+
+    yield participantsList;
   }
 
   Future<void> _inviteParticipant() async {
-    // Your invite participant logic
+    final email = _emailController.text.trim();
+    if (email.isNotEmpty) {
+      try {
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isNotEmpty) {
+          final userDoc = userSnapshot.docs.first;
+
+          await FirebaseFirestore.instance
+              .collection('events')
+              .doc(widget.eventId)
+              .update({
+            'participants': FieldValue.arrayUnion([email]),
+          });
+
+          _emailController.clear();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invitation sent successfully!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email not found!')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error during invitation!')),
+        );
+      }
+    }
   }
 
   Future<void> _navigateToEditEventPage() async {
@@ -82,23 +131,18 @@ class _EventPageState extends State<EventPage> {
       MaterialPageRoute(
         builder: (context) => EditEventPage(
           eventId: widget.eventId,
-          eventName: eventName,  // Pass the updated values to the EditEventPage
-          date: date,
-          location: location,
-          note: note,
-          invitedPeople: galleryImages, // Pass the updated values
+          eventName: widget.eventName,
+          date: widget.date,
+          location: widget.location,
+          note: widget.note,
+          invitedPeople: widget.galleryImages, // Pass the updated values
         ),
       ),
     );
 
     if (updatedEvent != null) {
       setState(() {
-        // Update the event data in the EventPage with the new values
-        eventName = updatedEvent['eventName'];
-        date = updatedEvent['date'];
-        location = updatedEvent['location'];
-        note = updatedEvent['note'];
-        galleryImages = updatedEvent['invitedPeople']; // Adjust as necessary
+        // Refresh event data if needed
       });
     }
   }
@@ -107,7 +151,24 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(eventName),
+        title: StreamBuilder<DocumentSnapshot>(
+          stream: _eventStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasData && snapshot.data != null) {
+              final eventData = snapshot.data!.data() as Map<String, dynamic>;
+              final eventName = eventData['eventName'] ?? widget.eventName;
+              return Text(
+                eventName,
+              );
+            }
+
+            return const Text('Event');
+          },
+        ),
         actions: [
           (widget.creatorId == currentUserId)
               ? IconButton(
@@ -120,15 +181,94 @@ class _EventPageState extends State<EventPage> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(date),
-            Text(location),
-            Text(note),
+            StreamBuilder<DocumentSnapshot>(
+              stream: _eventStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasData && snapshot.data != null) {
+                  final eventData = snapshot.data!.data() as Map<String, dynamic>;
+                  final eventDate = eventData['date'] ?? widget.date;
+                  final eventLocation = eventData['location'] ?? widget.location;
+                  final eventNote = eventData['note'] ?? widget.note;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Date of Event:',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Text(
+                        eventDate,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Location:',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Text(
+                        eventLocation,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Note:',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Text(
+                        eventNote,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  );
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+            // Participants list comes first
+            Text(
+              'Participants:',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            StreamBuilder<List<Map<String, String>>>(
+              stream: _participantsStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasData && snapshot.data != null) {
+                  final participants = snapshot.data!;
+                  return Expanded(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: participants.length,
+                      itemBuilder: (context, index) {
+                        final participant = participants[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(participant['imageUrl']!),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                return const Text('No participants');
+              },
+            ),
             if (widget.isCreator)
               TextField(
                 controller: _emailController,
@@ -138,27 +278,10 @@ class _EventPageState extends State<EventPage> {
               onPressed: _inviteParticipant,
               child: const Text('Invite'),
             ),
-            const SizedBox(height: 20),
-            Text('Participants:'),
-            Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: participantsData.length,
-                itemBuilder: (context, index) {
-                  final participant = participantsData[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(participant['imageUrl']!),
-                    ),
-                  );
-                },
-              ),
-            ),
           ],
         ),
       ),
     );
   }
+
 }
