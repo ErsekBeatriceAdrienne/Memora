@@ -52,7 +52,8 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
-  Stream<DocumentSnapshot> _eventStream() {
+  Stream<DocumentSnapshot> _eventStream()
+  {
     return FirebaseFirestore.instance
         .collection('events')
         .doc(widget.eventId)
@@ -87,7 +88,8 @@ class _EventPageState extends State<EventPage> {
     yield participantsList;
   }
 
-  Future<void> _inviteParticipant() async {
+  Future<void> _inviteParticipant() async
+  {
     final email = _emailController.text.trim();
     if (email.isNotEmpty) {
       try {
@@ -125,7 +127,8 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
-  Future<void> _navigateToEditEventPage() async {
+  Future<void> _navigateToEditEventPage() async
+  {
     final updatedEvent = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -148,7 +151,8 @@ class _EventPageState extends State<EventPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return Scaffold(
       appBar: AppBar(
         title: StreamBuilder<DocumentSnapshot>(
