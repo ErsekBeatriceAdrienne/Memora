@@ -20,7 +20,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-  List<Map<String, String>> friendsList = [];
 
   @override
   void initState() {
@@ -63,6 +62,17 @@ class _HomePageState extends State<HomePage> {
         ),
       ];
     });
+
+    _pages = <Widget>[
+      _buildHomeContent(),
+      CameraPage(
+        user: widget.user,
+        userData: widget.userData,
+      ),
+      ProfilePage(
+        user: widget.user, // Pass the entire user object here
+      ),
+    ];
   }
 
   Widget _buildHomeContent() {
