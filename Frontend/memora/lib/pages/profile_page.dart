@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
-      // Felhasználói adatok lekérése az aktuális felhasználói UID alapján
+      // Felhasználó adatainak lekérdezése
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user.uid)
@@ -35,12 +35,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (snapshot.exists) {
         final data = snapshot.data()!;
+
+        // Barátok emailjeinek kinyerése
+        final friendsEmails = (data['friends'] as List<dynamic>).cast<String>();
+
         setState(() {
-          userData = data;
+          userData = data; // Felhasználó adatai
         });
 
-        // Barátok email címeinek lekérése és feldolgozása
-        final friendsEmails = (data['friends'] as List<dynamic>).cast<String>();
+        // Barátok adatainak lekérdezése
         await _fetchFriendsData(friendsEmails);
       }
     } catch (e) {
@@ -50,9 +53,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchFriendsData(List<String> emails) async {
     try {
-      // Barátok adatainak lekérdezése az adatbázisból
-      final List<Map<String, String?>> fetchedData = [];
+      final List<Map<String, String?>> fetchedFriends = [];
       for (final email in emails) {
+        // Egyenként lekérdezzük az email alapján a barátokat
         final querySnapshot = await FirebaseFirestore.instance
             .collection('users')
             .where('email', isEqualTo: email)
@@ -66,8 +69,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ? (friendData['birthday'] as Timestamp).toDate().toString()
               : 'Unknown birthday';
 
-          fetchedData.add({
-            'email': email,
+          fetchedFriends.add({
+            'email': friendData['email'] as String?,
             'fullname': friendData['firstName'] + ' ' + friendData['lastName'],
             'imageUrl': friendData['profileImageUrl'] as String?,
             'username': friendData['username'] ?? 'No nickname',
@@ -77,13 +80,12 @@ class _ProfilePageState extends State<ProfilePage> {
       }
 
       setState(() {
-        friendsData = fetchedData;
+        friendsData = fetchedFriends;
       });
     } catch (e) {
       print('Error during friends data fetch: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +116,6 @@ class _ProfilePageState extends State<ProfilePage> {
             '${userData!['username']}',
             style: const TextStyle(fontSize: 18),
           ),
-
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

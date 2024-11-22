@@ -24,56 +24,56 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    fetchFriendsData();
+    //fetchFriendsData();
   }
 
-  Future<void> fetchFriendsData() async {
-    List<dynamic> friendsEmails = widget.userData['friends'] ?? [];
-    List<Map<String, String>> loadedFriends = [];
-
-    for (String email in friendsEmails) {
-      final query = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        var friendData = query.docs.first.data();
-        loadedFriends.add({
-          'name': '${friendData['firstName']} ${friendData['lastName']}',
-          'imageUrl': friendData['profileImageUrl'] ?? 'assets/images/default.png',
-          'nickname': friendData['username'] ?? 'N/A',
-          'birthday': friendData['birthday'] ?? 'Unknown',
-        });
-      }
-    }
-
-    setState(() {
-      friendsList = loadedFriends;
-      _pages = <Widget>[
-        _buildHomeContent(),
-        CameraPage(
-          user: widget.user,
-          userData: widget.userData,
-        ),
-        ProfilePage(
-          user: widget.user,
-        ),
-      ];
-    });
-
-    _pages = <Widget>[
-      _buildHomeContent(),
-      CameraPage(
-        user: widget.user,
-        userData: widget.userData,
-      ),
-      ProfilePage(
-        user: widget.user, // Pass the entire user object here
-      ),
-    ];
-  }
+  // Future<void> fetchFriendsData() async {
+  //   List<dynamic> friendsEmails = widget.userData['friends'] ?? [];
+  //   List<Map<String, String>> loadedFriends = [];
+  //
+  //   for (String email in friendsEmails) {
+  //     final query = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .where('email', isEqualTo: email)
+  //         .limit(1)
+  //         .get();
+  //
+  //     if (query.docs.isNotEmpty) {
+  //       var friendData = query.docs.first.data();
+  //       loadedFriends.add({
+  //         'name': '${friendData['firstName']} ${friendData['lastName']}',
+  //         'imageUrl': friendData['profileImageUrl'] ?? 'assets/images/default.png',
+  //         'nickname': friendData['username'] ?? 'N/A',
+  //         'birthday': friendData['birthday'] ?? 'Unknown',
+  //       });
+  //     }
+  //   }
+  //
+  //   setState(() {
+  //     friendsList = loadedFriends;
+  //     _pages = <Widget>[
+  //       _buildHomeContent(),
+  //       CameraPage(
+  //         user: widget.user,
+  //         userData: widget.userData,
+  //       ),
+  //       ProfilePage(
+  //         user: widget.user,
+  //       ),
+  //     ];
+  //   });
+  //
+  //   _pages = <Widget>[
+  //     _buildHomeContent(),
+  //     CameraPage(
+  //       user: widget.user,
+  //       userData: widget.userData,
+  //     ),
+  //     ProfilePage(
+  //       user: widget.user, // Pass the entire user object here
+  //     ),
+  //   ];
+  // }
 
   Widget _buildHomeContent() {
     return StreamBuilder<QuerySnapshot>(
