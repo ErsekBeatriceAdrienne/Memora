@@ -161,30 +161,31 @@ class _EventPageState extends State<EventPage> {
             if (snapshot.hasData && snapshot.data != null) {
               final eventData = snapshot.data!.data() as Map<String, dynamic>;
               final eventName = eventData['eventName'] ?? widget.eventName;
-              return Text(
-                eventName,
-              );
+              return Text(eventName);
             }
 
             return const Text('Event');
           },
         ),
         actions: [
-          (widget.creatorId == currentUserId)
-              ? IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _navigateToEditEventPage,
-          )
-              : CircleAvatar(
-            radius: 15,
-            backgroundImage: NetworkImage(widget.creatorProfileImageUrl),
-          ),
+          if (widget.creatorId == currentUserId)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: _navigateToEditEventPage,
+            )
+          else
+            CircleAvatar(
+              radius: 15,
+              backgroundImage: NetworkImage(widget.creatorProfileImageUrl),
+            ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Event details section
             StreamBuilder<DocumentSnapshot>(
               stream: _eventStream(),
               builder: (context, snapshot) {
@@ -234,7 +235,8 @@ class _EventPageState extends State<EventPage> {
                 return const SizedBox.shrink();
               },
             ),
-            // Participants list comes first
+            const SizedBox(height: 16), // Small spacing between sections
+            // Participants section
             Text(
               'Participants:',
               style: Theme.of(context).textTheme.bodyLarge,
@@ -248,7 +250,8 @@ class _EventPageState extends State<EventPage> {
 
                 if (snapshot.hasData && snapshot.data != null) {
                   final participants = snapshot.data!;
-                  return Expanded(
+                  return SizedBox(
+                    height: 60, // Adjust the height of the participants row
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: participants.length,
@@ -269,15 +272,18 @@ class _EventPageState extends State<EventPage> {
                 return const Text('No participants');
               },
             ),
-            if (widget.isCreator)
+            // Invitation input and button (if the user is the creator)
+            if (widget.isCreator) ...[
+              const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
               ),
-            ElevatedButton(
-              onPressed: _inviteParticipant,
-              child: const Text('Invite'),
-            ),
+              ElevatedButton(
+                onPressed: _inviteParticipant,
+                child: const Text('Invite'),
+              ),
+            ],
           ],
         ),
       ),

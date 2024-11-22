@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           userData: widget.userData,
         ),
         ProfilePage(
-          user: widget.user, // Pass the entire user object here
+          user: widget.user,
         ),
       ];
     });
@@ -160,6 +160,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _pages = <Widget>[
+    _buildHomeContent(),
+    CameraPage(
+      user: widget.user,
+      userData: widget.userData,
+    ),
+    ProfilePage(
+      user: widget.user,
+    ),
+  ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
