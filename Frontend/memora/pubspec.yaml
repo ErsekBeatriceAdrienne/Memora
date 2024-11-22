@@ -51,3 +51,7 @@ flutter:
     - assets/images/gyurika.png
     - assets/images/kati.png
     - assets/images/profile.png
+    - assets/images/home.png
+    - assets/images/signout.png
+    - assets/images/camera.png
+    - assets/images/memora.png

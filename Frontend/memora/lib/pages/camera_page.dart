@@ -122,19 +122,16 @@ class _CameraPageState extends State<CameraPage>
     }
   }
 
-  Future<String?> _uploadImage(File imageFile, String uploadPreset) async {
-    try {
-      if (uploadPreset.isEmpty) {
-        print('Upload preset nem lehet üres.');
-        return null;
-      }
+  Future<void> _uploadImageWithFeedback() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
 
-      final imageUrl = await cloudinaryService.uploadImageUnsigned(imageFile, uploadPreset);
-      return imageUrl;
-    } catch (e) {
-      print('Hiba a kép feltöltésekor: $e');
-      return null;
-    }
+    await _uploadImageToCloudinary();
+
+    Navigator.of(context).pop();
   }
 
   void _selectEvent(int index) {
@@ -189,9 +186,10 @@ class _CameraPageState extends State<CameraPage>
           ),
 
           ElevatedButton(
-            onPressed: _uploadImageToCloudinary,
+            onPressed: _uploadImageWithFeedback,
             child: const Text('Upload Image to Cloudinary'),
           ),
+
         ],
       ),
     );
