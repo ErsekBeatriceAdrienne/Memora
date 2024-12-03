@@ -1,0 +1,216 @@
+1. Bevezető
+Üdvözlünk a Memora alkalmazásban!
+Barátokkal és baráti társaságokkal együtt töltött pillanatok emlékezetesek, de sokszor nehéz átláthatóan megszervezni az eseményeket, vagy megőrizni az emlékeket. A Memora célja, hogy egy egyszerű, mégis hatékony megoldást nyújtson mindazoknak, akik szeretnék rendszerezni a közös eseményeket és emlékeiket.
+
+Az alkalmazásunk azok számára készült, akik unják a kaotikus csoportos beszélgetéseket és az elveszett fontos információkat. A Memora segít megszervezni az eseményeket, legyen szó egy kirándulásról, születésnapról vagy bármilyen baráti összejövetelről. Az alkalmazás egy dedikált platformot kínál, ahol az eseményekhez kapcsolódó információk, képek és videók mind egy helyen megtalálhatók, egyszerűen elérhető formában.
+
+Miért válaszd a Memora alkalmazást?
+
+Eseményközpontúság: Az alkalmazás minden funkciója az események köré épül, így könnyedén rendszerezheted a fontos adatokat és emlékeket.
+Tiszta kommunikáció: Nem kell többé keresgélni az üzenetfolyamban; itt minden lényeges információ jól látható.
+Egyszerű használat: Intuitív felülettel és könnyen kezelhető funkciókkal biztosítjuk a problémamentes szervezést és emlékmegőrzést.
+A Memora segít, hogy ne csak a pillanatokat éljük át, hanem örökre meg is őrizzük őket!
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Projekt célja
+A “Memora” projekt fő célja egy olyan alkalmazás fejlesztése, amely megkönnyíti a baráti társaságok számára az események megszervezését és a közös emlékek megőrzését. Az applikáció egyedi megoldást kínál az eseményalapú rendszerezésre, minimalizálva a hagyományos csoportos beszélgetések kaotikus jellegét.
+
+Főbb jellemzők:
+Események létrehozása és kezelése: Az alkalmazás lehetőséget biztosít események létrehozására, azok részleteinek tárolására (pl. időpont, helyszín, leírás) és az esemény résztvevőinek kezelésére.
+
+Képek és videók megőrzése:
+Az alkalmazásba beépített kamerafunkció segítségével közvetlenül készíthetsz képeket és videókat. A felhasználók minden alkalommal, amikor egy új képet vagy videót rögzítenek, kiválaszthatják, hogy az melyik eseményhez tartozik. Ezáltal az emlékek automatikusan az adott eseményhez kapcsolódnak, biztosítva az egyszerű és átlátható rendszerezést.
+
+Zavartalan szervezés: Az eseményekkel kapcsolatos információk tisztán és átláthatóan érhetők el, anélkül, hogy a felesleges üzenetváltások elnyomnák a lényeget.
+
+Felhasználóbarát felület: Az alkalmazás intuitív és letisztult designja könnyen érthető és használható minden korosztály számára.
+
+Egyedi fókusz: A Memora teljes egészében az eseményekre koncentrál, ezzel egyedivé téve a használati élményt a hasonló alkalmazásokhoz képest.
+
+Kiknek ajánljuk?
+Az alkalmazást minden baráti társaságnak és közösségnek ajánljuk, akik egyszerűen és átláthatóan szeretnék megszervezni közös programjaikat, valamint megőrizni a legszebb pillanataikat.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Követelmény specifikációk
+1. Felhasználói követelmények
+Célfelhasználók:
+Az alkalmazás bármely baráti társaság vagy közösség számára készült, beleértve a 10–12 éves gyerekeket, fiatal felnőtteket és az idősebb generációkat is (50–55 éves korig).
+Fő funkciók:
+Események szervezése és dokumentálása.
+Képek és videók készítése, majd elmentése.
+Galéria böngészése, valamint események részleteinek megtekintése.
+Felhasználói élmény:
+Egyszerű használat és gyors regisztráció.
+Vizuálisan vonzó, letisztult és átlátható dizájn.
+Könnyen érthető és tiszta információk megjelenítése.
+2. Funkcionális követelmények
+Regisztráció és bejelentkezés:
+A Firebase autentikációt használva a regisztrációhoz a következő adatok szükségesek: név, felhasználónév, email, jelszó (profilkép opcionális).
+Bejelentkezéshez az email cím és a jelszó megadása szükséges.
+Funkciók:
+Események létrehozása és dokumentálása:
+Eseményekhez megadható cím, dátum, helyszín, leírás, valamint résztvevők listája.
+Galéria:
+Képek és videók mentése az eseményekhez kapcsolódva.
+Keresési funkciók esemény, személy, dátum és helyszín alapján.
+Offline működés:
+Az alkalmazás kizárólag internetkapcsolattal működik.
+3. Nem-funkcionális követelmények
+Platform:
+Az alkalmazás kizárólag Androidos platformon érhető el.
+Minimum követelmények:
+Android 13 operációs rendszer.
+Folyamatos internetkapcsolat.
+4. Adatvédelem
+A Firebase Authentication segítségével kezeljük a regisztrációkat és bejelentkezéseket, biztosítva a felhasználói adatok biztonságát.
+A Firestore adatbázisban tároljuk a felhasználók és események adatait, míg a képek és videók tárolása a Cloudinary rendszerében történik.
+Az adatkezelés megfelel az adatvédelmi előírásoknak (pl. GDPR).
+5. Egyéb specifikációk
+Tervezett technológiák:
+Frontend: Flutter.
+Backend: Firebase és Cloudinary.
+Együttműködés:
+Verziókezelés: GitHub.
+Kommunikáció: Discord, Messenger.
+
+
+Követelmény specifikáció a Memóra alkalmazáshoz
+A Memóra egy olyan mobilalkalmazás, amelyet baráti társaságok és közösségek számára terveztünk, hogy megkönnyítse az események szervezését, dokumentálását és a közös emlékek megőrzését. Az alkalmazás célja, hogy minden korosztály számára egyszerű, mégis hasznos eszközt biztosítson, különösen a 10–12 éves gyerekektől kezdve egészen az idősebb generációig (50–55 éves korig).
+
+Az alkalmazás fő funkciói közé tartozik az események létrehozása és azok részleteinek tárolása (például cím, dátum, helyszín, résztvevők és leírás). Ezen túlmenően lehetőséget biztosít képek és videók készítésére, amelyek az adott eseményhez kapcsolódnak, illetve egy galéria funkciót kínál, amelyben keresni lehet események, személyek, dátumok és helyszínek alapján.
+
+Az alkalmazás használata egyszerű és felhasználóbarát lesz, vizuálisan vonzó, letisztult dizájnnal, amely az átláthatóságot és az információk könnyű elérhetőségét helyezi előtérbe. A regisztráció gyors és könnyen elvégezhető, mindössze néhány alapvető adat megadásával.
+
+Felhasználói azonosítás és belépés
+A regisztráció Firebase autentikáció segítségével történik, amely biztosítja az adatok biztonságát. A regisztráció során meg kell adni a nevet, felhasználónevet, email-címet, valamint egy jelszót. Opcionálisan egy profilkép is feltölthető. A bejelentkezéshez az email-cím és a jelszó megadása szükséges.
+
+Funkcionális elvárások
+Az alkalmazás fő funkciói az események létrehozására és kezelésére összpontosítanak. Az eseményekhez részletes információk adhatók meg, mint például a cím, dátum, helyszín, eseményleírás és a résztvevők listája. A galéria funkció lehetővé teszi képek és videók mentését az eseményekhez kapcsolódóan, illetve keresési funkciót biztosít események, személyek, dátumok és helyszínek alapján.
+
+Fontos megjegyezni, hogy az alkalmazás kizárólag internetkapcsolat mellett működik, és nincs offline módja.
+
+Működési környezet
+Az alkalmazás kizárólag Androidos platformokon érhető el, és a működéshez legalább Android 13 operációs rendszerre van szükség. Emellett folyamatos internetkapcsolat elengedhetetlen a funkciók használatához.
+
+Adatvédelem
+A felhasználók adatainak biztonsága kiemelt prioritás. A Firebase Authentication kezeli a regisztrációkat és a bejelentkezéseket, míg a Firestore adatbázis szolgál az események és felhasználói adatok tárolására. A képek és videók tárolása a Cloudinary rendszerén keresztül valósul meg, amely biztosítja a médiafájlok gyors és megbízható elérését. Az alkalmazás fejlesztése és működése során kiemelt figyelmet fordítunk az adatvédelmi előírások betartására, beleértve a GDPR szabályait is.
+
+Technológiai háttér és csapatmunka
+Az alkalmazás fejlesztése Flutter alapú frontenddel történik, a backend pedig Firebase-t és Cloudinary-t használ. A csapat tagjai a GitHubot használják a verziókezeléshez, valamint a Discord és Messenger alkalmazásokat a kommunikációhoz és együttműködéshez.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Tervezés/Architektúra
+
+A Memóra alkalmazás célja, hogy segítsen a felhasználóknak események szervezésében és dokumentálásában, miközben egyszerűen megoszthatják a képeiket és videóikat barátaikkal. Az alkalmazás backend-je kizárólag a Firebase platformot használja, amely tartalmazza a felhasználói autentikációt és az adatbázis kezelést a Firestore-ban. A frontend egy Flutter alkalmazás, amely az MVVM (Model-View-ViewModel) architektúrára épít, biztosítva a tiszta és karbantartható kódot, valamint a hatékony adatkezelést.
+
+1. Backend struktúra
+A Memóra backendjét teljes egészében a Firebase biztosítja, amely az alábbi funkciókat látja el:
+
+Autentikáció: A Firebase Authentication használatával történik a felhasználói regisztráció és bejelentkezés, ezzel biztosítva az adatok biztonságát és a felhasználók azonosítását.
+Adatbázis: Az alkalmazás az adatokat a Firebase Firestore adatbázisban tárolja, amely NoSQL struktúrával rendelkezik, lehetővé téve az egyszerű adatkezelést és a valós idejű frissítéseket.
+Fájlkezelés: A képeket és videókat a Cloudinary szolgáltatás tárolja. Minden fájl nevét és elérhetőségét úgy formázzák, hogy könnyen azonosítható legyen, melyik eseményhez vagy felhasználóhoz tartozik.
+2. Adatbázis struktúra
+A Firestore-ban az alábbi adatstruktúrával dolgozunk:
+
+users gyűjtemény: Ebben találhatók a felhasználók adatai, mint a születési dátum, e-mail cím, profilkép, felhasználónév, barátok listája stb.
+events gyűjtemény: Az események adatainak tárolására szolgál, beleértve az esemény nevét, dátumát, helyszínét, leírását és résztvevőit. Az eseményekhez kapcsolódó képek és videók is itt találhatók.
+Relációk:
+Az events gyűjteményben az creatorId a felhasználó egyedi azonosítójára utal, aki létrehozta az eseményt, míg a participants mezőben találhatók azok a felhasználók, akik meghívást kaptak.
+A users gyűjteményben a friends mező tartalmazza a felhasználó barátainak e-mail címét, így biztosítva a kapcsolatok kezelését.
+3. Fájlok kezelése
+A képek és videók tárolása a Cloudinary szolgáltatásban történik. A képek egy központi mappában helyezkednek el, amely az eseményekhez és felhasználói profilokhoz tartozó fájlokat egyaránt tartalmaz. A fájlok elnevezése az eseményeknél az esemény ID-ját, míg a profilképeknél a felhasználó ID-ját tartalmazza, így biztosítva a könnyű azonosítást és hozzáférést.
+
+4. Felhasználói élmény (UI/UX)
+A Memóra frontendje Flutter keretrendszerben készül, az MVVM architektúra alapján. Az MVVM (Model-View-ViewModel) elválasztja a felhasználói felületet az üzleti logikától, ezáltal tisztább és könnyebben karbantartható kódot biztosít. A Model az adatokat tartalmazza, a View felel a vizuális megjelenítésért, míg a ViewModel kezeli az adatokat és kommunikál a Model és a View között.
+
+5. Kommunikáció a Firebase-szel
+A Memóra alkalmazás valós idejű adatokat használ a Firestore-ból, lehetővé téve a dinamikus frissítéseket, például események létrehozása és módosítása, valamint a felhasználók barátainak és eseményeinek megjelenítése. Az alkalmazás nem használ explicit stream-eket, de az adatbázis valós idejű természetének köszönhetően a változások automatikusan tükröződnek a felhasználói felületen.
+
+6. Egyéb technológiai részletek
+A Memóra alkalmazás nem integrál külső API-kat, hanem kizárólag a Firebase és Cloudinary platformokat használja az adatok kezelésére és a fájlok tárolására. A felhasználói adatok biztonságát a Firebase biztonsági szabályai garantálják, amelyek biztosítják, hogy a felhasználók csak az általuk jogosult adatokhoz férhessenek hozzá. Ezen kívül a Google Bejelentkezés is támogatott, hogy a felhasználók egyszerűen és gyorsan csatlakozhassanak.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Felhasználói kézikönyv
+A Memóra egy egyszerűen használható alkalmazás, amely lehetővé teszi a felhasználók számára események létrehozását, képek és videók megosztását, valamint azok dokumentálását barátaikkal. Az alábbiakban bemutatjuk, hogyan lehet a legjobban kihasználni az alkalmazás funkcionalitásait.
+
+1. Regisztráció és Bejelentkezés
+Miután letöltötted és telepítetted az alkalmazást, az alábbi lépéseket kell követned a regisztrációhoz és bejelentkezéshez:
+
+Regisztráció: A regisztráció során meg kell adnod a nevedet, felhasználónevedet, e-mail címedet és egy jelszót. Opcionálisan beállíthatsz profilképet.
+Bejelentkezés: Ha már regisztráltál, egyszerűen jelentkezz be az e-mail címed és jelszavad megadásával.
+2. Profil létrehozása és módosítása
+A regisztráció után beállíthatod és módosíthatod a profilodat:
+
+Profilkép: A profilképet csak a regisztráció során tudod beállítani. Később nem módosíthatod.
+Felhasználói név és adatok: A felhasználónevet és egyéb adatokat (pl. név, e-mail cím) bármikor módosíthatod a beállítások menüben.
+3. Események létrehozása
+Az alkalmazás központi funkciója az események létrehozása és dokumentálása. Az események létrehozásához kövesd az alábbi lépéseket:
+
+Az új eseményt a Home oldalon található gombbal hozhatod létre.
+Az eseményekhez egy beépített térképet is használhatsz, amiről kiválaszthatod a helyszínt, és ez automatikusan elmentődik az adatbázisba.
+Az események létrehozói bármikor szerkeszthetik az általuk létrehozott eseményeket.
+4. Képek és videók készítése
+A Memóra lehetőséget biztosít képek és videók készítésére, amelyeket hozzárendelhetsz az eseményeidhez:
+
+Készíts képet vagy videót közvetlenül az alkalmazásban.
+A készített tartalmakat automatikusan hozzáadhatod az adott eseményhez, és megoszthatod a résztvevőkkel.
+5. Galéria és keresés
+Az összes eseményhez tartozó képeket és videókat megtalálhatod a Galéria menüben. Itt az alábbi lehetőségeid vannak:
+
+Eseményekhez rendelt galéria: Minden eseményhez saját galéria tartozik, ahol megtekintheted az eseményhez kapcsolódó képeket és videókat. Más események galériáját nem láthatod.
+6. Barátok kezelése
+A Memóra alkalmazásban lehetőséged van barátokat hozzáadni és kezelni:
+
+A barátokat a profiljuk e-mail címe alapján adhatod hozzá.
+Miután barátod lett valaki, könnyen meghívhatod őt eseményekre, és ő is láthatja a közös galériát.
+7. Offline mód
+Fontos megjegyezni, hogy az alkalmazás nem működik offline. Mivel az adatokat a Firebase-en és a Cloudinary-n tároljuk, internetkapcsolatra van szükség a regisztrációhoz, bejelentkezéshez, valamint az események és képek kezeléséhez.
+
+8. Biztonság és adatvédelem
+A Memóra alkalmazás a felhasználók adatainak biztonságát biztosítja:
+
+Az adatok titkosítva vannak és csak az általad engedélyezett személyek férhetnek hozzá.
+A Firebase Authentication biztosítja a biztonságos bejelentkezést, míg az adatbázis (Firestore) védelme garantálja, hogy csak a megfelelő felhasználók láthatják a saját adataikat és eseményeiket.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+6.Osszefoglalo
+
+A projekt célja, hogy egy egyszerűen használható, könnyen kezelhető alkalmazást biztosítson, amely segíti a felhasználókat események szervezésében és dokumentálásában, valamint képek és videók készítésében, megosztásában. Az alkalmazás fókuszában nem a szórakoztató használat, hanem az információk áttekinthetősége és megosztása áll, biztosítva a felhasználói élményt és a funkcionalitás hatékony megvalósítását.
+
+A fejlesztés során számos akadályba ütköztünk, mivel mindhárman újonnan ismerkedtünk meg a Flutter és a Firebase technológiákkal. Az egyik legnagyobb kihívás az volt, hogy időigényes volt összekötni a frontendet a Firestore adatbázissal, és hogy a képek kezelése is problémát okozott, mivel a képek tárolása és kezelése új feladatot jelentett számunkra.
+
+A legnagyobb eredményünk, hogy sikeresen megvalósítottuk az adatkezelést: az adatbázisból minden adat megjelenítése működik, a bejelentkezést Firebase autentikációval oldottuk meg, a képek tárolására pedig a Cloudinary szolgáltatását használtuk. Büszkék vagyunk arra is, hogy sikerült olyan funkciókat megvalósítani, mint az integrált kamera és a térkép. Az alkalmazás tesztelése saját Android telefonjainkon történt, hogy folyamatosan nyomon követhessük a fejlesztési folyamatot.
+
+Jövőbeli fejlesztési lehetőségek:
+
+Szebb UI dizájn: A jelenlegi verzióban inkább a funkcionalitásra összpontosítottunk, de szeretnénk javítani a megjelenést és vizuálisan vonzóbbá tenni az alkalmazást.
+Keresés a galériában: Szeretnénk, hogy a felhasználók könnyen kereshetnek az események, ismerősök, dátumok és helyszínek alapján.
+Értesítések az eseményekről: Beépíthető értesítések az események változásaival kapcsolatban.
+Visszajelzés az eseményekről: Lehetőség a meghívottak számára, hogy visszajelezzenek egy eseménnyel kapcsolatosan.
+Barátok bejelölése QR kód alapján: Könnyen hozzáadhatóak barátok az alkalmazáshoz QR kódok segítségével.
+Ismerősök meghívása NFC-vel: Az NFC alapú meghívás lehetősége, amely megkönnyíti az eseményekhez való csatlakozást.
+Személyre szabott dizájn: Több témával történő testreszabás lehetősége, hogy a felhasználók jobban igazíthassák az alkalmazást az ízlésükhöz.
+Szavazások létrehozása: Lehetőség szavazások indítására egy eseményen belül, amelyekre a meghívottak válaszolhatnak.
+Jegyzetek létrehozása ismerősöknél: Lehetőség barátok számára jegyzetek készítésére, például születésnapi ötletek vagy közös megbeszéléses információk rögzítésére.
+Ez a projekt egy remek lehetőség volt számunkra, hogy megismerkedjünk új technológiákkal, és egy hasznos alkalmazást hozzunk létre, amely segíthet a felhasználóknak a mindennapi események egyszerű és hatékony kezelésében. A jövőbeni fejlesztések és bővítések lehetőséget biztosítanak arra, hogy még több funkcióval és finomhangolással szolgálhassuk ki a felhasználókat.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
